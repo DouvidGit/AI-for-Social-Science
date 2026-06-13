@@ -68,10 +68,7 @@
     }
 
     .hero {
-      display: grid;
-      grid-template-columns: minmax(0, 0.9fr) minmax(320px, 1.1fr);
-      gap: 36px;
-      align-items: end;
+      max-width: 720px;
       padding-bottom: 36px;
       border-bottom: 1px solid var(--line);
     }
@@ -91,26 +88,10 @@
       font-size: 18px;
     }
 
-    .brief {
-      padding: 24px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: var(--panel);
-      box-shadow: var(--shadow);
-    }
-
-    .brief h2,
-    .stage h2,
-    .summary h2 {
+    .stage h2 {
       margin: 0 0 10px;
       font-size: 21px;
       line-height: 1.25;
-    }
-
-    .brief p,
-    .summary p {
-      margin: 0;
-      color: var(--muted);
     }
 
     .stage {
@@ -352,20 +333,6 @@
       white-space: pre-wrap;
     }
 
-    .summary {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 16px;
-      margin-top: 28px;
-    }
-
-    .summary article {
-      padding: 20px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.72);
-    }
-
     .warning {
       margin-top: 18px;
       color: var(--warn);
@@ -378,13 +345,7 @@
         padding-top: 24px;
       }
 
-      .hero,
-      .summary {
-        grid-template-columns: 1fr;
-      }
-
-      .stage,
-      .brief {
+      .stage {
         padding: 20px;
       }
 
@@ -410,18 +371,8 @@
     </div>
 
     <section class="hero" aria-labelledby="page-title">
-      <div>
-        <h1 id="page-title">大家都排那边</h1>
-        <p class="lead">
-          这是一个关于从众行为的微型互动实验。你会看到三条都能进入同一活动的队伍，然后选择自己想排哪一条。
-        </p>
-      </div>
-      <aside class="brief">
-        <h2>这在研究什么？</h2>
-        <p>
-          当人们不确定该怎么选时，可能会把“别人在哪里排队”当作线索。这个页面先做最小版本：一次选择，一句理由。
-        </p>
-      </aside>
+      <h1 id="page-title">大家都排那边</h1>
+      <p class="lead">三条队都能进入同一个活动。看一眼现场，选一条你会排的队。</p>
     </section>
 
     <section class="stage" aria-labelledby="experiment-title">
@@ -467,30 +418,13 @@
 
       <div class="result" id="result" aria-live="polite">
         <strong>已记录本次反馈</strong>
-        <p>
-          这份记录先保存在你的浏览器里。正式上线后，可以再接入表单或数据库，把不同同学的选择汇总起来。
-        </p>
+        <p class="helper">这份记录先保存在你的浏览器里。</p>
         <div class="actions">
           <button class="secondary" id="copyBtn" type="button">复制本次记录</button>
           <button class="secondary" id="downloadBtn" type="button">下载 JSON</button>
         </div>
         <pre class="data-box" id="dataBox"></pre>
       </div>
-    </section>
-
-    <section class="summary" aria-label="项目说明">
-      <article>
-        <h2>给谁用</h2>
-        <p>高中同学、老师或家长。任何人都可以用手机或电脑快速完成一次模拟选择。</p>
-      </article>
-      <article>
-        <h2>现在不做</h2>
-        <p>不做倒计时、复杂动画、AI 生成器和数据看板。先验证这个交互是否能被理解和完成。</p>
-      </article>
-      <article>
-        <h2>反馈用途</h2>
-        <p>选择结果和一句理由可以帮助判断：人多队是否会被理解为更可靠、更正确或更值得跟随。</p>
-      </article>
     </section>
 
     <p class="warning">
