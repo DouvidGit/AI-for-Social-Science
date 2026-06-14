@@ -24,3 +24,8 @@
 
 ## 怎么收集反馈
 记录用户选择的队伍、哪条队是人多队、用户是否注意到人数差异，以及用户填写的一句话理由。第一版只验证用户是否理解场景、愿不愿意完成、理由中是否自然出现从众相关线索。
+
+## Research Question & Hypothesis
+Research Question: How does an online queue-choice experiment using an interactive simulation affect high school students' tendency to choose a crowded line over shorter lines?
+
+Hypothesis: I hypothesize that after using the interactive queue simulation, high school students will increase their tendency to choose the crowded line over shorter lines.
