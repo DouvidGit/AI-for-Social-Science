@@ -88,6 +88,77 @@
       font-size: 18px;
     }
 
+    .research-toggle {
+      margin-top: 24px;
+    }
+
+    .research-panel {
+      display: none;
+      margin-top: 18px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .research-panel.is-visible {
+      display: block;
+    }
+
+    .research-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .research-card {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(246, 247, 243, 0.72);
+    }
+
+    .research-card h2,
+    .references-panel h2 {
+      margin: 0 0 8px;
+      font-size: 17px;
+      line-height: 1.3;
+    }
+
+    .research-card p,
+    .references-panel li {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .research-card p + p {
+      margin-top: 8px;
+    }
+
+    .references-panel {
+      display: none;
+      margin-top: 14px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+    }
+
+    .references-panel.is-visible {
+      display: block;
+    }
+
+    .references-panel ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .references-panel li + li {
+      margin-top: 10px;
+    }
+
     .stage h2 {
       margin: 0 0 10px;
       font-size: 21px;
@@ -349,6 +420,14 @@
         padding: 20px;
       }
 
+      .research-panel {
+        padding: 18px;
+      }
+
+      .research-grid {
+        grid-template-columns: 1fr;
+      }
+
       .queues {
         grid-template-columns: 1fr;
       }
@@ -373,6 +452,57 @@
     <section class="hero" aria-labelledby="page-title">
       <h1 id="page-title">大家都排那边</h1>
       <p class="lead">三条队都能进入同一个活动。看一眼现场，选一条你会排的队。</p>
+      <div class="research-toggle">
+        <button class="secondary" id="researchToggle" type="button" aria-expanded="false" aria-controls="researchPanel">研究 / The research</button>
+      </div>
+    </section>
+
+    <section class="research-panel" id="researchPanel" aria-label="研究说明">
+      <div class="research-grid">
+        <article class="research-card">
+          <h2>研究问题</h2>
+          <p>How do differences in visible queue length in an interactive online queue simulation affect high school students' line choice?</p>
+        </article>
+        <article class="research-card">
+          <h2>假设</h2>
+          <p>When one line is visibly more crowded and everything else is the same, high school students may choose the crowded line more often.</p>
+          <p>Reason: other people's choices can look like a signal of reliability.</p>
+        </article>
+        <article class="research-card">
+          <h2>为什么重要</h2>
+          <p>In real life, we often choose with incomplete information. A long line can mean more waiting, but it can also look safer or more correct.</p>
+          <p>Online platforms use similar signals too: likes, views, ratings, downloads, and popularity labels.</p>
+        </article>
+        <article class="research-card">
+          <h2>我做了什么</h2>
+          <p>I built a one-minute queue-choice simulation. Users see three lines for the same entrance, choose one line, and explain why.</p>
+          <p>The page records the selected line, the crowded line, whether the crowded line was chosen, response time, and a short reason.</p>
+        </article>
+        <article class="research-card">
+          <h2>期待的初步发现</h2>
+          <p>The user study has not run yet. I expect some users to choose the crowded line because it feels more reliable or more likely to be correct.</p>
+          <p>I also expect some users to choose shorter lines because they care more about speed.</p>
+        </article>
+        <article class="research-card">
+          <h2>下一步</h2>
+          <p>I will add a more controlled version, such as a balanced condition where all lines have similar lengths.</p>
+          <p>Then I can compare choices with and without a strong crowd signal.</p>
+        </article>
+      </div>
+
+      <div class="actions">
+        <button class="secondary" id="referencesToggle" type="button" aria-expanded="false" aria-controls="referencesPanel">References</button>
+      </div>
+      <div class="references-panel" id="referencesPanel">
+        <h2>References used in this project</h2>
+        <ul>
+          <li>Banerjee (1992): people may rationally follow a group when others' actions seem informative.</li>
+          <li>Bikhchandani, Hirshleifer, and Welch (1992): early choices can create informational cascades.</li>
+          <li>Cai, Chen, and Fang (2009): showing popular restaurant choices can change what people order.</li>
+          <li>Salganik, Dodds, and Watts (2006): online popularity signals can shape choices and make outcomes less predictable.</li>
+          <li>Zhou and Soman (2003): waiting lines are also social scenes, not only time costs.</li>
+        </ul>
+      </div>
     </section>
 
     <section class="stage" aria-labelledby="experiment-title">
@@ -447,6 +577,10 @@
     const dataBox = document.getElementById("dataBox");
     const copyBtn = document.getElementById("copyBtn");
     const downloadBtn = document.getElementById("downloadBtn");
+    const researchToggle = document.getElementById("researchToggle");
+    const researchPanel = document.getElementById("researchPanel");
+    const referencesToggle = document.getElementById("referencesToggle");
+    const referencesPanel = document.getElementById("referencesPanel");
 
     let crowdedQueue = "";
     let selectedQueue = "";
@@ -566,6 +700,18 @@
       link.download = "queue-feedback.json";
       link.click();
       URL.revokeObjectURL(link.href);
+    });
+
+    researchToggle.addEventListener("click", () => {
+      const isOpen = researchPanel.classList.toggle("is-visible");
+      researchToggle.setAttribute("aria-expanded", String(isOpen));
+      researchToggle.textContent = isOpen ? "收起研究 / Hide research" : "研究 / The research";
+    });
+
+    referencesToggle.addEventListener("click", () => {
+      const isOpen = referencesPanel.classList.toggle("is-visible");
+      referencesToggle.setAttribute("aria-expanded", String(isOpen));
+      referencesToggle.textContent = isOpen ? "Hide references" : "References";
     });
 
     renderScene();
