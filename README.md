@@ -7,9 +7,6 @@
 在线作品页：
 https://ai-for-social-science-douvid.vercel.app/
 
-本地打开方法：
-直接双击根目录里的 `index.html`，或用浏览器打开它。
-
 仓库结构：
 
 - `index.html`：唯一的作品入口，也是 Vercel 部署的页面。
@@ -23,9 +20,6 @@ This is an interactive online queue simulation studying how visible queue length
 
 Live project page:
 https://ai-for-social-science-douvid.vercel.app/
-
-How to open locally:
-Open `index.html` directly in a browser.
 
 Repository structure:
 
