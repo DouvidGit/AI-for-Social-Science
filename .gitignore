@@ -1,0 +1,11 @@
+.vercel
+node_modules/
+*.log
+desktop.ini
+package.json
+package-lock.json
+deepseek-local-server.js
+midterm-presentation/archive/
+midterm-presentation/preview/
+midterm-presentation/*.pptx
+midterm-presentation/*.pdf

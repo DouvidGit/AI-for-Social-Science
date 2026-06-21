@@ -604,6 +604,43 @@
       margin-bottom: 8px;
     }
 
+    .ai-tool {
+      margin-top: 22px;
+      padding: 24px;
+      border: 1px solid rgba(80, 68, 48, 0.14);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.78);
+      box-shadow: var(--shadow);
+    }
+
+    .ai-tool h2 {
+      margin: 0 0 8px;
+      font-size: 21px;
+      line-height: 1.25;
+    }
+
+    .ai-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(260px, 0.75fr);
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .ai-output {
+      min-height: 140px;
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--ink);
+      white-space: pre-wrap;
+    }
+
+    .ai-output.is-muted {
+      color: var(--muted);
+    }
+
     .data-box {
       overflow: auto;
       max-height: 180px;
@@ -646,6 +683,10 @@
       }
 
       .research-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .ai-grid {
         grid-template-columns: 1fr;
       }
 
@@ -749,8 +790,8 @@
         </div>
 
         <div class="result" id="result" aria-live="polite">
-          <strong>已记录本次反馈</strong>
-          <p class="helper">这份记录先保存在你的浏览器里。</p>
+          <strong id="resultTitle">已记录本次反馈</strong>
+          <p class="helper" id="resultHelper">这份记录会提交到研究数据库。</p>
           <div class="actions">
             <button class="secondary" id="copyBtn" type="button">复制本次记录</button>
             <button class="secondary" id="downloadBtn" type="button">下载 JSON</button>
@@ -812,12 +853,42 @@
       </div>
     </section>
 
+    <section class="ai-tool" aria-labelledby="ai-tool-title">
+      <div class="step">AI Draft Tool</div>
+      <h2 id="ai-tool-title">队伍设计建议</h2>
+      <p class="helper">输入一个排队场景和目标，先让 AI 生成一版可测试的队伍布局。当前只接入研究设计思路，真实实验数据还没有接入。</p>
+
+      <div class="ai-grid">
+        <div class="field">
+          <label for="aiScenario">场景</label>
+          <textarea id="aiScenario" placeholder="例如：校园讲座签到处，三个入口都能进，学生只看到队伍长度。"></textarea>
+        </div>
+        <div class="field">
+          <label for="aiGoal">目标</label>
+          <select id="aiGoal">
+            <option value="让 A 队看起来人更多">让 A 队人更多</option>
+            <option value="让 B 队看起来人更多">让 B 队人更多</option>
+            <option value="让 C 队看起来人更多">让 C 队人更多</option>
+            <option value="三条队伍看起来一样多">三条队一样多</option>
+            <option value="让整体等待时间最少">整体等待时间最少</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="primary" id="aiGenerateBtn" type="button">生成建议</button>
+      </div>
+      <div class="ai-output is-muted" id="aiOutput">生成结果会显示在这里。</div>
+    </section>
+
     <p class="warning">
-      隐私说明：这个 MVP 不收集姓名、邮箱或联系方式。当前反馈只保存在本机浏览器。
+      隐私说明：这个 MVP 不收集姓名、邮箱或联系方式。你的反馈会提交到研究数据库，用于后续统计分析。
     </p>
   </main>
 
   <script>
+    const SUPABASE_URL = "https://ubjlmjpawywldzrvedvk.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InViamxtanBhd3l3bGR6cnZlZHZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3ODMxMDIsImV4cCI6MjA5NjM1OTEwMn0.UGThz_KRuTEYwaRFkT41tFJaGmV1TmWvuThzpcRNMF8";
     const queueLabels = ["A", "B", "C"];
     const crowdedCount = 12;
     const quietCounts = [3, 4];
@@ -835,8 +906,11 @@
     const reasonEl = document.getElementById("reason");
     const avoidReasonEl = document.getElementById("avoidReason");
     const perceivedMostEl = document.getElementById("perceivedMost");
+    const submitBtn = document.getElementById("submitBtn");
     const resetBtn = document.getElementById("resetBtn");
     const resultEl = document.getElementById("result");
+    const resultTitle = document.getElementById("resultTitle");
+    const resultHelper = document.getElementById("resultHelper");
     const dataBox = document.getElementById("dataBox");
     const copyBtn = document.getElementById("copyBtn");
     const downloadBtn = document.getElementById("downloadBtn");
@@ -845,6 +919,10 @@
     const researchPanel = document.getElementById("researchPanel");
     const referencesToggle = document.getElementById("referencesToggle");
     const referencesPanel = document.getElementById("referencesPanel");
+    const aiScenarioEl = document.getElementById("aiScenario");
+    const aiGoalEl = document.getElementById("aiGoal");
+    const aiGenerateBtn = document.getElementById("aiGenerateBtn");
+    const aiOutput = document.getElementById("aiOutput");
 
     let crowdedQueue = "";
     let selectedQueue = "";
@@ -983,10 +1061,63 @@
     function showResult(record) {
       latestRecord = record;
       localStorage.setItem("queueMvpLastRecord", JSON.stringify(record));
+      if (record.submission_status === "saved_to_supabase") {
+        resultTitle.textContent = "已提交到研究数据库";
+        resultHelper.textContent = "谢谢！这条反馈已经进入 Supabase，之后可以和其他人的数据一起分析。";
+      } else if (record.submission_status === "local_only_supabase_failed") {
+        resultTitle.textContent = "暂时没有提交成功";
+        resultHelper.textContent = "网络或数据库连接失败，这条记录已先保存在本机。你可以复制或下载 JSON 作为备份。";
+      } else {
+        resultTitle.textContent = "已记录本次反馈";
+        resultHelper.textContent = "这份记录会提交到研究数据库。";
+      }
       dataBox.textContent = JSON.stringify(record, null, 2);
       resultEl.classList.add("is-visible");
       researchReveal.classList.add("is-visible");
       resultEl.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function buildSupabaseRow(record) {
+      return {
+        client_created_at: record.created_at,
+        project: record.project,
+        condition: record.condition,
+        start_mode: record.start_mode,
+        scene_started_at: record.scene_started_at,
+        selected_at: record.selected_at,
+        selected_queue: record.selected_queue,
+        crowded_queue: record.crowded_queue,
+        queue_counts: record.queue_counts,
+        selected_crowded_queue: record.selected_crowded_queue,
+        perceived_most_crowded_queue: record.perceived_most_crowded_queue,
+        perceived_crowd_correct: record.perceived_crowd_correct,
+        reason_text: record.reason_text,
+        avoid_reason_text: record.avoid_reason_text,
+        response_time_seconds: record.response_time_seconds,
+        response_time_definition: record.response_time_definition,
+        device_type: record.device_type,
+        user_agent: navigator.userAgent,
+        page_url: window.location.href,
+        raw_payload: record
+      };
+    }
+
+    async function saveToSupabase(record) {
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/queue_responses`, {
+        method: "POST",
+        headers: {
+          "apikey": SUPABASE_ANON_KEY,
+          "authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+          "content-type": "application/json",
+          "prefer": "return=minimal"
+        },
+        body: JSON.stringify(buildSupabaseRow(record))
+      });
+
+      if (!response.ok) {
+        const message = await response.text();
+        throw new Error(message || `Supabase error ${response.status}`);
+      }
     }
 
     continueBtn.addEventListener("click", () => {
@@ -999,7 +1130,7 @@
     startBtn.addEventListener("click", () => startExperiment("manual"));
     resetBtn.addEventListener("click", resetToIntro);
 
-    form.addEventListener("submit", (event) => {
+    form.addEventListener("submit", async (event) => {
       event.preventDefault();
       const record = {
         project: "queue_choice_simulation",
@@ -1020,7 +1151,22 @@
         device_type: getDeviceType(),
         created_at: new Date().toISOString()
       };
-      showResult(record);
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "提交中…";
+
+      try {
+        await saveToSupabase(record);
+        record.submission_status = "saved_to_supabase";
+        showResult(record);
+      } catch (error) {
+        record.submission_status = "local_only_supabase_failed";
+        record.submission_error = error.message;
+        showResult(record);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "提交反馈";
+      }
     });
 
     copyBtn.addEventListener("click", async () => {
@@ -1058,6 +1204,42 @@
       const isOpen = referencesPanel.classList.toggle("is-visible");
       referencesToggle.setAttribute("aria-expanded", String(isOpen));
       referencesToggle.textContent = isOpen ? "Hide references" : "References";
+    });
+
+    aiGenerateBtn.addEventListener("click", async () => {
+      const scenario = aiScenarioEl.value.trim();
+      const goal = aiGoalEl.value;
+
+      if (!scenario) {
+        aiOutput.textContent = "请先写一个场景。";
+        aiOutput.classList.add("is-muted");
+        return;
+      }
+
+      aiGenerateBtn.disabled = true;
+      aiOutput.textContent = "正在生成建议……";
+      aiOutput.classList.add("is-muted");
+
+      try {
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ scenario, goal })
+        });
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "请求失败。");
+        }
+
+        aiOutput.textContent = data.answer || "DeepSeek 没有返回内容。";
+        aiOutput.classList.remove("is-muted");
+      } catch (error) {
+        aiOutput.textContent = `没有调通：${error.message}\n\n如果这是线上页面，请检查 Vercel 里是否已经添加服务器环境变量。`;
+        aiOutput.classList.add("is-muted");
+      } finally {
+        aiGenerateBtn.disabled = false;
+      }
     });
 
     renderScene();
