@@ -245,41 +245,28 @@
     .scene {
       position: relative;
       overflow: hidden;
-      min-height: clamp(500px, 64vh, 640px);
-      padding: 24px 26px 20px;
       border: 1px solid rgba(80, 68, 48, 0.12);
       border-radius: 10px;
-      background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.58) 0, rgba(255, 255, 255, 0.18) 34%, rgba(112, 92, 58, 0.08) 100%),
-        repeating-linear-gradient(90deg, transparent 0, transparent 72px, rgba(94, 79, 56, 0.035) 72px, rgba(94, 79, 56, 0.035) 73px),
-        var(--warm);
+      background: var(--warm);
     }
 
     .choice-scene.is-hidden {
       display: none;
     }
 
-    .scene::before {
-      position: absolute;
-      inset: auto 0 0;
-      height: 38%;
-      background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(113, 94, 64, 0.08)),
-        repeating-linear-gradient(0deg, rgba(76, 67, 54, 0.08) 0, rgba(76, 67, 54, 0.08) 1px, transparent 1px, transparent 34px);
-      content: "";
-      pointer-events: none;
-    }
-
     .scene-sign {
-      position: relative;
-      z-index: 1;
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      z-index: 3;
       display: flex;
       justify-content: center;
-      margin-bottom: 10px;
       color: rgba(31, 36, 32, 0.64);
       font-size: 13px;
       font-weight: 650;
       letter-spacing: 0;
+      pointer-events: none;
+      transform: translateX(-50%);
     }
 
     .scene-sign span {
@@ -289,73 +276,72 @@
       background: rgba(255, 255, 255, 0.54);
     }
 
-    .entrance {
+    .queue-viewport {
       position: relative;
-      z-index: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: min(360px, 72%);
-      min-height: 42px;
-      margin: 0 auto 26px;
-      border: 0;
-      border-bottom: 4px solid rgba(44, 102, 86, 0.28);
-      border-radius: 0;
-      background: rgba(255, 255, 255, 0.16);
-      color: var(--accent-strong);
-      font-weight: 650;
-      text-align: center;
-      box-shadow: none;
+      min-height: clamp(430px, 58vh, 620px);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0)),
+        var(--warm);
     }
 
-    .entrance::before,
-    .entrance::after {
+    .queue-viewport canvas {
+      display: block;
+      width: 100%;
+      height: clamp(430px, 58vh, 620px);
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .scene-loading {
       position: absolute;
-      top: 6px;
-      bottom: -4px;
-      width: 1px;
-      background: rgba(32, 35, 31, 0.16);
-      content: "";
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      font-size: 14px;
+      pointer-events: none;
     }
 
-    .entrance::before {
-      left: 0;
-    }
-
-    .entrance::after {
-      right: 0;
+    .scene-loading.is-hidden {
+      display: none;
     }
 
     .queues {
-      position: relative;
-      z-index: 1;
+      position: absolute;
+      bottom: 18px;
+      left: 50%;
+      z-index: 4;
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: clamp(10px, 3vw, 34px);
-      max-width: 900px;
-      margin: 0 auto;
+      gap: 8px;
+      width: min(520px, calc(100% - 32px));
+      transform: translateX(-50%);
     }
 
     .queue-button {
       display: flex;
       flex-direction: column;
+      align-items: center;
+      justify-content: center;
       position: relative;
-      min-height: 340px;
-      padding: 10px 8px 14px;
-      border: 1px solid transparent;
+      min-height: 58px;
+      padding: 8px 10px;
+      border: 1px solid rgba(255, 255, 255, 0.78);
       border-radius: 8px;
-      background: transparent;
+      background: rgba(255, 255, 255, 0.76);
       color: var(--ink);
-      text-align: left;
+      text-align: center;
       cursor: pointer;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 24px rgba(48, 42, 31, 0.12);
       transition: border-color 0.16s ease, transform 0.16s ease, background 0.16s ease, box-shadow 0.16s ease;
     }
 
     .queue-button:hover,
     .queue-button:focus-visible {
-      border-color: rgba(44, 102, 86, 0.25);
-      background: rgba(255, 255, 255, 0.24);
-      transform: translateY(-1px);
+      border-color: rgba(44, 102, 86, 0.42);
+      background: rgba(255, 255, 255, 0.9);
+      transform: translateY(-2px);
       outline: none;
     }
 
@@ -370,7 +356,6 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      margin-bottom: 4px;
       font-weight: 760;
     }
 
@@ -383,83 +368,13 @@
       clip-path: inset(50%);
     }
 
-    .queue-path {
-      position: relative;
-      display: flex;
-      flex: 1;
-      justify-content: center;
-      min-height: 280px;
-      padding-top: 12px;
-    }
-
-    .path-line {
-      position: absolute;
-      top: 4px;
-      bottom: 10px;
-      left: 50%;
-      width: 1px;
-      border-left: 1px solid rgba(32, 35, 31, 0.12);
-      transform: translateX(-50%);
-    }
-
-    .path-line::before {
-      position: absolute;
-      top: -4px;
-      left: 50%;
-      width: 46px;
-      height: 10px;
-      border-radius: 999px;
-      background: rgba(47, 111, 94, 0.12);
-      content: "";
-      transform: translateX(-50%);
-    }
-
-    .people {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2px;
-    }
-
-    .person {
-      width: 22px;
-      height: 22px;
-      border-radius: 50% 50% 46% 46%;
-      background: var(--accent);
-      opacity: 0.92;
-      position: relative;
-      box-shadow: 0 1px 0 rgba(32, 35, 31, 0.16);
-    }
-
-    .person:nth-child(odd) {
-      transform: translateX(-9px);
-    }
-
-    .person:nth-child(even) {
-      transform: translateX(9px);
-    }
-
-    .person::after {
-      position: absolute;
-      left: 50%;
-      bottom: -4px;
-      width: 70%;
-      height: 5px;
-      border-radius: 999px;
-      background: rgba(47, 111, 94, 0.22);
-      content: "";
-      transform: translateX(-50%);
-    }
-
     .queue-hint {
       min-height: 24px;
-      margin-top: 10px;
+      margin-top: 3px;
       color: var(--muted);
       font-size: 14px;
       text-align: center;
-      opacity: 0;
+      opacity: 1;
       transition: opacity 0.16s ease;
     }
 
@@ -477,11 +392,7 @@
     }
 
     .choice-scene > .actions {
-      position: absolute;
-      right: 24px;
-      bottom: 22px;
-      z-index: 3;
-      margin-top: 0;
+      justify-content: flex-end;
     }
 
     .primary,
@@ -691,20 +602,32 @@
       }
 
       .queues {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        bottom: 12px;
+        width: calc(100% - 24px);
       }
 
       .scene {
-        min-height: auto;
-        padding: 16px 12px;
+        padding: 0;
       }
 
       .queue-button {
-        min-height: 260px;
+        min-height: 56px;
+        padding: 7px 6px;
       }
 
-      .queue-path {
-        min-height: 220px;
+      .queue-name {
+        font-size: 15px;
+      }
+
+      .queue-hint {
+        font-size: 12px;
+      }
+
+      .queue-viewport,
+      .queue-viewport canvas {
+        min-height: 430px;
+        height: 430px;
       }
 
       .choice-scene > .actions {
@@ -747,7 +670,10 @@
 
           <div class="scene">
             <div class="scene-sign"><span>校园活动签到处</span></div>
-            <div class="entrance">入口</div>
+            <div class="queue-viewport">
+              <canvas id="queueCanvas" aria-label="第一人称排队选择场景"></canvas>
+              <div class="scene-loading" id="sceneLoading">正在进入现场</div>
+            </div>
             <div class="queues" id="queues" aria-label="三条可选择队伍"></div>
           </div>
 
@@ -886,7 +812,14 @@
     </p>
   </main>
 
-  <script>
+  <script type="module">
+    let THREE = null;
+    try {
+      THREE = await import("https://unpkg.com/three@0.159.0/build/three.module.js");
+    } catch (error) {
+      console.warn("Three.js could not be loaded; using the button-only fallback.", error);
+    }
+
     const SUPABASE_URL = "https://ubjlmjpawywldzrvedvk.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InViamxtanBhd3l3bGR6cnZlZHZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3ODMxMDIsImV4cCI6MjA5NjM1OTEwMn0.UGThz_KRuTEYwaRFkT41tFJaGmV1TmWvuThzpcRNMF8";
     const queueLabels = ["A", "B", "C"];
@@ -900,6 +833,8 @@
     const choiceScene = document.getElementById("choiceScene");
     const activityPanel = document.getElementById("activityPanel");
     const queuesEl = document.getElementById("queues");
+    const queueCanvas = document.getElementById("queueCanvas");
+    const sceneLoading = document.getElementById("sceneLoading");
     const continueBtn = document.getElementById("continueBtn");
     const form = document.getElementById("feedbackForm");
     const reasonLabel = document.getElementById("reasonLabel");
@@ -934,6 +869,7 @@
     let startMode = "manual";
     let autoStartTimer = null;
     let latestRecord = null;
+    let queue3d = null;
 
     function pickCrowdedQueue() {
       return queueLabels[Math.floor(Math.random() * queueLabels.length)];
@@ -947,8 +883,236 @@
       }, {});
     }
 
-    function makePeople(count) {
-      return Array.from({ length: count }, () => '<span class="person" aria-hidden="true"></span>').join("");
+    function setSelectedQueue(label) {
+      selectedQueue = label;
+      selectedAt = performance.now();
+      selectedAtIso = new Date().toISOString();
+      document.querySelectorAll(".queue-button").forEach((item) => {
+        const isSelected = item.dataset.queue === label;
+        item.classList.toggle("is-selected", isSelected);
+        item.querySelector(".queue-hint").textContent = isSelected ? "已选择" : "站到这里";
+      });
+      reasonLabel.textContent = `你为什么选择 ${selectedQueue} 队？`;
+      continueBtn.disabled = false;
+      if (queue3d) {
+        queue3d.select(label);
+      }
+    }
+
+    function renderQueueControls() {
+      queuesEl.innerHTML = queueLabels.map((label) => {
+        return `
+          <button class="queue-button" type="button" data-queue="${label}" aria-label="选择 ${label} 队">
+            <span class="queue-name">
+              <span>${label} 队</span>
+              <span class="queue-count">可进入</span>
+            </span>
+            <span class="queue-hint">站到这里</span>
+          </button>
+        `;
+      }).join("");
+
+      document.querySelectorAll(".queue-button").forEach((button) => {
+        button.addEventListener("click", () => setSelectedQueue(button.dataset.queue));
+      });
+    }
+
+    function createQueue3d(canvas, onSelect) {
+      if (!THREE) {
+        sceneLoading.textContent = "3D 现场暂时无法加载，请用下方按钮选择。";
+        return {
+          render() {},
+          select() {}
+        };
+      }
+
+      const renderer = new THREE.WebGLRenderer({
+        canvas,
+        antialias: false,
+        alpha: false,
+        powerPreference: "low-power"
+      });
+      renderer.setClearColor(0xf4efe4, 1);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0xf4efe4);
+      scene.fog = new THREE.Fog(0xf4efe4, 10, 38);
+
+      const camera = new THREE.PerspectiveCamera(58, 1, 0.1, 60);
+      camera.position.set(0, 1.62, 9.6);
+      camera.lookAt(0, 1.2, -4.6);
+
+      const raycaster = new THREE.Raycaster();
+      const pointer = new THREE.Vector2();
+      const laneObjects = new Map();
+      const labelSprites = [];
+      const selectedRing = new THREE.Group();
+      const root = new THREE.Group();
+      scene.add(root);
+      const lanes = [
+        { label: "A", x: -4.2 },
+        { label: "B", x: 0 },
+        { label: "C", x: 4.2 }
+      ];
+
+      const floorMat = new THREE.MeshLambertMaterial({ color: 0xd8cbb5 });
+      const laneMat = new THREE.MeshLambertMaterial({ color: 0xc5b599 });
+      const wallMat = new THREE.MeshLambertMaterial({ color: 0xf7f4eb });
+      const doorMat = new THREE.MeshLambertMaterial({ color: 0x2f6f5e });
+      const postMat = new THREE.MeshLambertMaterial({ color: 0x7f725d });
+      const bodyMat = new THREE.MeshLambertMaterial({ color: 0x2f6f5e });
+      const headMat = new THREE.MeshLambertMaterial({ color: 0xf0c7a5 });
+      const selectedMat = new THREE.MeshBasicMaterial({ color: 0xfff4b8, transparent: true, opacity: 0.72 });
+
+      const hemi = new THREE.HemisphereLight(0xffffff, 0xb8aa92, 2.4);
+      scene.add(hemi);
+      const sun = new THREE.DirectionalLight(0xffffff, 1.6);
+      sun.position.set(-4, 8, 6);
+      scene.add(sun);
+
+      function addBox(w, h, d, x, y, z, mat, parent = root) {
+        const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+        mesh.position.set(x, y, z);
+        parent.add(mesh);
+        return mesh;
+      }
+
+      function makeLabelTexture(text) {
+        const labelCanvas = document.createElement("canvas");
+        labelCanvas.width = 256;
+        labelCanvas.height = 128;
+        const ctx = labelCanvas.getContext("2d");
+        ctx.fillStyle = "rgba(255,255,255,0.92)";
+        if (typeof ctx.roundRect === "function") {
+          ctx.roundRect(18, 18, 220, 92, 18);
+        } else {
+          ctx.rect(18, 18, 220, 92);
+        }
+        ctx.fill();
+        ctx.strokeStyle = "rgba(47,111,94,0.38)";
+        ctx.lineWidth = 5;
+        ctx.stroke();
+        ctx.fillStyle = "#22332d";
+        ctx.font = "700 58px Arial, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(text, 128, 66);
+        const texture = new THREE.CanvasTexture(labelCanvas);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        return texture;
+      }
+
+      function addLaneLabel(label, x) {
+        const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: makeLabelTexture(`${label} 队`) }));
+        sprite.position.set(x, 2.6, -6.25);
+        sprite.scale.set(1.62, 0.78, 1);
+        labelSprites.push(sprite);
+        root.add(sprite);
+      }
+
+      function addPerson(x, z, offset, parent = root) {
+        const group = new THREE.Group();
+        group.position.set(x + offset, 0, z);
+
+        const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.18, 0.5, 3, 8), bodyMat);
+        body.position.set(0, 0.62, 0);
+        group.add(body);
+
+        const head = new THREE.Mesh(new THREE.SphereGeometry(0.17, 10, 8), headMat);
+        head.position.set(0, 1.18, 0);
+        group.add(head);
+
+        const bag = addBox(0.14, 0.22, 0.08, -0.2, 0.63, 0.03, postMat, group);
+        bag.rotation.z = 0.1;
+        parent.add(group);
+      }
+
+      function buildBase() {
+        root.clear();
+        laneObjects.clear();
+        labelSprites.length = 0;
+        selectedRing.clear();
+
+        addBox(16, 0.08, 26, 0, -0.04, -3.8, floorMat);
+        addBox(16, 3.1, 0.25, 0, 1.55, -8.15, wallMat);
+        addBox(2.2, 2.25, 0.28, -4.2, 1.08, -8.0, doorMat);
+        addBox(2.2, 2.25, 0.28, 0, 1.08, -8.0, doorMat);
+        addBox(2.2, 2.25, 0.28, 4.2, 1.08, -8.0, doorMat);
+
+        lanes.forEach(({ label, x }) => {
+          const lane = addBox(1.25, 0.012, 13.6, x, 0.012, -1.2, laneMat);
+          lane.userData.queueLabel = label;
+          laneObjects.set(label, lane);
+          addBox(0.08, 0.55, 10.4, x - 0.86, 0.28, -0.8, postMat);
+          addBox(0.08, 0.55, 10.4, x + 0.86, 0.28, -0.8, postMat);
+          addLaneLabel(label, x);
+        });
+
+        const ringGeo = new THREE.TorusGeometry(0.78, 0.035, 8, 42);
+        const ring = new THREE.Mesh(ringGeo, selectedMat);
+        ring.rotation.x = Math.PI / 2;
+        ring.position.y = 0.05;
+        selectedRing.add(ring);
+        selectedRing.visible = false;
+        root.add(selectedRing);
+      }
+
+      function renderCounts(counts) {
+        buildBase();
+        lanes.forEach(({ label, x }) => {
+          const count = counts[label] || 0;
+          const step = count > 8 ? 0.64 : 0.82;
+          for (let i = 0; i < count; i += 1) {
+            const z = -6.35 + i * step;
+            const side = i % 2 === 0 ? -0.16 : 0.16;
+            addPerson(x, z, side);
+          }
+        });
+        resize();
+        sceneLoading.classList.add("is-hidden");
+      }
+
+      function resize() {
+        const rect = canvas.getBoundingClientRect();
+        const width = Math.max(1, Math.floor(rect.width));
+        const height = Math.max(1, Math.floor(rect.height));
+        if (canvas.width !== Math.floor(width * renderer.getPixelRatio()) || canvas.height !== Math.floor(height * renderer.getPixelRatio())) {
+          renderer.setSize(width, height, false);
+          camera.aspect = width / height;
+          camera.updateProjectionMatrix();
+        }
+        renderer.render(scene, camera);
+      }
+
+      function handlePointer(event) {
+        const rect = canvas.getBoundingClientRect();
+        const localX = event.clientX - rect.left;
+        pointer.x = (localX / rect.width) * 2 - 1;
+        pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+        raycaster.setFromCamera(pointer, camera);
+        const hits = raycaster.intersectObjects([...laneObjects.values()], false);
+        if (hits[0]?.object?.userData?.queueLabel) {
+          onSelect(hits[0].object.userData.queueLabel);
+          return;
+        }
+        const third = Math.min(2, Math.max(0, Math.floor((localX / rect.width) * 3)));
+        onSelect(queueLabels[third]);
+      }
+
+      canvas.addEventListener("pointerdown", handlePointer);
+      window.addEventListener("resize", resize);
+
+      return {
+        render: renderCounts,
+        select(label) {
+          const lane = laneObjects.get(label);
+          if (!lane) return;
+          selectedRing.visible = true;
+          selectedRing.position.set(lane.position.x, 0, 5.0);
+          renderer.render(scene, camera);
+        }
+      };
     }
 
     function renderScene() {
@@ -975,37 +1139,11 @@
 
       const counts = getCounts();
       currentCounts = counts;
-      queuesEl.innerHTML = queueLabels.map((label) => {
-        return `
-          <button class="queue-button" type="button" data-queue="${label}" aria-label="选择 ${label} 队">
-            <span class="queue-name">
-              <span>${label} 队</span>
-              <span class="queue-count">可进入</span>
-            </span>
-            <span class="queue-path">
-              <span class="path-line" aria-hidden="true"></span>
-              <span class="people">${makePeople(counts[label])}</span>
-            </span>
-            <span class="queue-hint">站到这里</span>
-          </button>
-        `;
-      }).join("");
-
-      document.querySelectorAll(".queue-button").forEach((button) => {
-        button.addEventListener("click", () => {
-          selectedQueue = button.dataset.queue;
-          selectedAt = performance.now();
-          selectedAtIso = new Date().toISOString();
-          document.querySelectorAll(".queue-button").forEach((item) => {
-            item.classList.remove("is-selected");
-            item.querySelector(".queue-hint").textContent = "站到这里";
-          });
-          button.classList.add("is-selected");
-          button.querySelector(".queue-hint").textContent = "已选择";
-          reasonLabel.textContent = `你为什么选择 ${selectedQueue} 队？`;
-          continueBtn.disabled = false;
-        });
-      });
+      renderQueueControls();
+      if (!queue3d) {
+        queue3d = createQueue3d(queueCanvas, setSelectedQueue);
+      }
+      queue3d.render(counts);
     }
 
     function getDeviceType() {
@@ -1039,12 +1177,12 @@
     function startExperiment(mode) {
       clearAutoStartTimer();
       startMode = mode;
-      renderScene();
-      sceneStartedAt = performance.now();
-      sceneStartedAtIso = new Date().toISOString();
       document.body.classList.add("experiment-running");
       introPanel.classList.add("is-hidden");
       experimentArea.classList.add("is-visible");
+      renderScene();
+      sceneStartedAt = performance.now();
+      sceneStartedAtIso = new Date().toISOString();
       experimentArea.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
