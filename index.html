@@ -4,35 +4,78 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>校园活动入口体验</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     :root {
       color-scheme: light;
-      --bg: #f4f1ea;
-      --ink: #1f2420;
-      --muted: #5f675f;
-      --line: #d8d3c8;
-      --panel: #ffffff;
-      --accent: #2c6656;
-      --accent-strong: #1f4f42;
-      --accent-soft: #e4eee8;
-      --warm: #ebe1cf;
-      --warn: #8a5a22;
-      --shadow: 0 18px 45px rgba(40, 36, 29, 0.09);
+      --bg: #f8f3ee;
+      --ink: #252321;
+      --muted: #706b66;
+      --line: rgba(54, 48, 44, 0.14);
+      --panel: rgba(255, 253, 249, 0.78);
+      --panel-strong: rgba(255, 253, 249, 0.92);
+      --accent: #b97880;
+      --accent-strong: #57434a;
+      --accent-soft: #f1dfe4;
+      --warm: #f4ece3;
+      --lilac: #d8cfdf;
+      --pistachio: #dfe7c7;
+      --butter: #f3df94;
+      --warn: #8f6d57;
+      --shadow: 0 12px 34px rgba(56, 48, 43, 0.07);
+      --soft-shadow: 0 8px 22px rgba(74, 58, 54, 0.05);
     }
 
     * {
       box-sizing: border-box;
     }
 
+    [hidden] {
+      display: none !important;
+    }
+
     body {
+      position: relative;
       margin: 0;
-      background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0) 42%),
-        var(--bg);
+      min-height: 100vh;
+      overflow-x: hidden;
+      background: var(--bg);
       color: var(--ink);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+      font-family: "Noto Serif SC", "Songti SC", SimSun, serif;
       line-height: 1.65;
       letter-spacing: 0;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: -24vh -18vw auto;
+      height: 92vh;
+      z-index: -2;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse at 18% 34%, rgba(232, 176, 169, 0.42), transparent 42%),
+        radial-gradient(ellipse at 82% 16%, rgba(216, 207, 223, 0.48), transparent 44%),
+        radial-gradient(ellipse at 68% 72%, rgba(223, 231, 199, 0.62), transparent 48%),
+        conic-gradient(from 118deg at 52% 42%, rgba(255, 255, 255, 0), rgba(243, 223, 148, 0.34), rgba(255, 255, 255, 0.26), rgba(185, 120, 128, 0.22), rgba(255, 255, 255, 0));
+      filter: blur(10px) saturate(108%);
+      transform: rotate(-4deg);
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      opacity: 0.38;
+      background-image:
+        linear-gradient(rgba(37, 35, 33, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(37, 35, 33, 0.018) 1px, transparent 1px);
+      background-size: 28px 28px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.92), rgba(0, 0, 0, 0.25) 70%, transparent);
     }
 
     button,
@@ -44,7 +87,70 @@
     main {
       width: min(1180px, calc(100% - 32px));
       margin: 0 auto;
-      padding: 26px 0 56px;
+      padding: clamp(20px, 3vw, 34px) 0 64px;
+    }
+
+    .consent-screen {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 28px 16px;
+    }
+
+    .consent-card {
+      width: min(720px, 100%);
+      padding: clamp(28px, 5vw, 46px);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background:
+        radial-gradient(ellipse at 12% 0%, rgba(243, 223, 148, 0.34), transparent 36%),
+        radial-gradient(ellipse at 88% 16%, rgba(216, 207, 223, 0.42), transparent 42%),
+        linear-gradient(135deg, rgba(255, 253, 249, 0.95), rgba(248, 241, 235, 0.88));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .consent-card h1 {
+      max-width: 620px;
+      margin-bottom: 14px;
+      font-size: clamp(30px, 4vw, 46px);
+    }
+
+    .consent-lead {
+      margin: 0;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .consent-list {
+      display: grid;
+      gap: 12px;
+      margin: 24px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .consent-list li {
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.72);
+    }
+
+    .consent-list strong {
+      display: block;
+      margin-bottom: 2px;
+      color: var(--ink);
+    }
+
+    .consent-list span {
+      color: var(--muted);
+    }
+
+    .consent-note {
+      margin: 18px 0 0;
+      color: var(--muted);
+      font-size: 14px;
     }
 
     .topbar {
@@ -61,19 +167,63 @@
       display: inline-flex;
       align-items: center;
       min-height: 32px;
-      padding: 5px 11px;
+      padding: 5px 12px;
       border: 1px solid var(--line);
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.72);
+      background: rgba(255, 253, 249, 0.66);
       color: var(--accent-strong);
-      font-weight: 650;
+      font-weight: 680;
+      backdrop-filter: blur(12px);
     }
 
     .hero {
-      max-width: 760px;
-      padding-bottom: 22px;
+      display: grid;
+      place-items: center;
+      min-height: clamp(430px, 67vh, 680px);
+      max-width: none;
+      margin-bottom: 22px;
+      padding: clamp(40px, 8vw, 88px) clamp(20px, 5vw, 64px);
+      overflow: hidden;
+      position: relative;
+      text-align: center;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background:
+        linear-gradient(180deg, rgba(255, 253, 249, 0.36), rgba(255, 253, 249, 0.76)),
+        var(--panel);
+      box-shadow: var(--shadow);
+      isolation: isolate;
     }
 
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: -18% -10%;
+      z-index: -2;
+      background:
+        radial-gradient(ellipse at 24% 40%, rgba(226, 160, 157, 0.46), transparent 37%),
+        radial-gradient(ellipse at 74% 32%, rgba(216, 207, 223, 0.58), transparent 41%),
+        radial-gradient(ellipse at 54% 76%, rgba(223, 231, 199, 0.62), transparent 42%),
+        conic-gradient(from 152deg at 48% 46%, rgba(255, 255, 255, 0.88), rgba(243, 223, 148, 0.3), rgba(255, 255, 255, 0.72), rgba(185, 120, 128, 0.18), rgba(255, 255, 255, 0.82));
+      filter: blur(16px) saturate(112%);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 28px;
+      z-index: -1;
+      border: 1px solid rgba(54, 48, 44, 0.08);
+      border-radius: 3px;
+      background:
+        linear-gradient(120deg, transparent 0 24%, rgba(255, 253, 249, 0.3) 24.2% 25%, transparent 25.2% 100%),
+        linear-gradient(90deg, rgba(37, 35, 33, 0.032) 1px, transparent 1px),
+        linear-gradient(rgba(37, 35, 33, 0.026) 1px, transparent 1px);
+      background-size: auto, 46px 46px, 46px 46px;
+      opacity: 0.78;
+    }
+
+    .intro-visible .hero,
     .experiment-running .hero {
       display: none;
     }
@@ -82,13 +232,13 @@
       max-width: 620px;
       margin: 0;
       font-size: clamp(36px, 6vw, 72px);
-      line-height: 1.06;
+      line-height: 1.02;
       font-weight: 760;
     }
 
     .lead {
       max-width: 620px;
-      margin: 18px 0 0;
+      margin: 18px auto 0;
       color: var(--muted);
       font-size: 18px;
     }
@@ -103,8 +253,32 @@
     .quick-facts {
       display: flex;
       flex-wrap: wrap;
+      justify-content: center;
       gap: 8px;
-      margin-top: 16px;
+      margin-top: 20px;
+    }
+
+    .hero .actions {
+      justify-content: center;
+      margin-top: 28px;
+    }
+
+    .hero .primary {
+      min-width: 160px;
+    }
+
+    body:not(.intro-visible):not(.experiment-running) main#appContent,
+    body.intro-visible main#appContent,
+    body.queue-active main#appContent {
+      width: 100%;
+      padding: 0;
+    }
+
+    body:not(.intro-visible):not(.experiment-running) .hero {
+      min-height: 100svh;
+      margin-bottom: 0;
+      border: 0;
+      border-radius: 0;
     }
 
     .research-toggle {
@@ -122,8 +296,9 @@
       padding: 24px;
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: var(--panel);
-      box-shadow: var(--shadow);
+      background: var(--panel-strong);
+      box-shadow: var(--soft-shadow);
+      backdrop-filter: blur(18px);
     }
 
     .research-panel.is-visible {
@@ -140,7 +315,8 @@
       padding: 18px;
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: rgba(246, 247, 243, 0.72);
+      background:
+        linear-gradient(145deg, rgba(255, 253, 249, 0.78), rgba(246, 238, 234, 0.58));
     }
 
     .research-card h2,
@@ -167,7 +343,7 @@
       padding: 18px;
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: #ffffff;
+      background: rgba(255, 253, 249, 0.86);
     }
 
     .references-panel.is-visible {
@@ -192,11 +368,25 @@
     .stage {
       margin-top: 22px;
       padding: 0;
-      border: 1px solid rgba(89, 82, 67, 0.16);
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.74);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: var(--panel);
       box-shadow: var(--shadow);
       overflow: hidden;
+      backdrop-filter: blur(18px);
+      display: none;
+    }
+
+    .intro-visible .stage,
+    .experiment-running .stage {
+      display: block;
+    }
+
+    body.intro-visible .stage {
+      min-height: 100svh;
+      margin-top: 0;
+      border: 0;
+      border-radius: 0;
     }
 
     .stage-header {
@@ -208,11 +398,22 @@
     }
 
     .intro-panel {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
       min-height: 58vh;
       padding: clamp(28px, 5vw, 64px);
+      position: relative;
+      overflow: hidden;
       background:
-        linear-gradient(90deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.54)),
+        linear-gradient(115deg, rgba(255, 253, 249, 0.92), rgba(255, 253, 249, 0.48)),
+        radial-gradient(ellipse at 78% 18%, rgba(216, 207, 223, 0.48), transparent 42%),
+        radial-gradient(ellipse at 72% 88%, rgba(223, 231, 199, 0.58), transparent 44%),
         var(--warm);
+    }
+
+    .intro-panel::after {
+      display: none;
     }
 
     .intro-panel.is-hidden {
@@ -237,6 +438,10 @@
       font-size: 14px;
     }
 
+    body.intro-visible .intro-panel {
+      min-height: 100svh;
+    }
+
     .experiment-area {
       display: none;
       padding: 24px;
@@ -253,15 +458,17 @@
     .step {
       color: var(--accent);
       font-size: 14px;
-      font-weight: 700;
+      font-weight: 760;
     }
 
     .scene {
       position: relative;
       overflow: hidden;
-      border: 1px solid rgba(80, 68, 48, 0.12);
-      border-radius: 10px;
-      background: var(--warm);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background:
+        linear-gradient(180deg, rgba(255, 253, 249, 0.46), rgba(248, 241, 235, 0.78)),
+        var(--warm);
     }
 
     .choice-scene.is-hidden {
@@ -286,14 +493,16 @@
       padding: 5px 12px;
       border: 1px solid rgba(31, 36, 32, 0.14);
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.54);
+      background: rgba(255, 253, 249, 0.72);
+      backdrop-filter: blur(10px);
     }
 
     .queue-viewport {
       position: relative;
       min-height: clamp(430px, 58vh, 620px);
       background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0)),
+        radial-gradient(ellipse at 50% 0%, rgba(216, 207, 223, 0.34), transparent 46%),
+        linear-gradient(180deg, rgba(255, 253, 249, 0.46), rgba(255, 253, 249, 0)),
         var(--warm);
     }
 
@@ -339,27 +548,27 @@
       padding: 8px 10px;
       border: 1px solid rgba(255, 255, 255, 0.78);
       border-radius: 8px;
-      background: rgba(255, 255, 255, 0.76);
+      background: rgba(255, 253, 249, 0.78);
       color: var(--ink);
       text-align: center;
       cursor: pointer;
       backdrop-filter: blur(10px);
-      box-shadow: 0 10px 24px rgba(48, 42, 31, 0.12);
+      box-shadow: 0 10px 24px rgba(74, 58, 54, 0.1);
       transition: border-color 0.16s ease, transform 0.16s ease, background 0.16s ease, box-shadow 0.16s ease;
     }
 
     .queue-button:hover,
     .queue-button:focus-visible {
-      border-color: rgba(44, 102, 86, 0.42);
-      background: rgba(255, 255, 255, 0.9);
+      border-color: rgba(185, 120, 128, 0.42);
+      background: rgba(255, 253, 249, 0.94);
       transform: translateY(-2px);
       outline: none;
     }
 
     .queue-button.is-selected {
-      border-color: rgba(47, 111, 94, 0.62);
-      background: rgba(230, 240, 235, 0.68);
-      box-shadow: inset 0 0 0 1px rgba(47, 111, 94, 0.16);
+      border-color: rgba(185, 120, 128, 0.58);
+      background: rgba(241, 223, 228, 0.64);
+      box-shadow: inset 0 0 0 1px rgba(185, 120, 128, 0.16);
     }
 
     .queue-name {
@@ -409,29 +618,46 @@
     .primary,
     .secondary {
       min-height: 44px;
-      padding: 10px 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 17px;
       border-radius: 8px;
       cursor: pointer;
       font-weight: 720;
+      text-decoration: none;
+      transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease, border-color 0.16s ease;
     }
 
     .primary {
-      border: 1px solid var(--accent);
-      background: var(--accent);
-      color: #ffffff;
+      border: 1px solid #41383b;
+      background: #2f2a2c;
+      color: #fffdfa;
+      box-shadow: 0 12px 26px rgba(47, 42, 44, 0.16);
+    }
+
+    .primary:hover,
+    .primary:focus-visible,
+    .secondary:hover,
+    .secondary:focus-visible {
+      transform: translateY(-1px);
+      outline: none;
     }
 
     .primary:disabled {
       border-color: var(--line);
-      background: #d7dcd2;
-      color: #81877d;
+      background: #d8d2ce;
+      color: #837d78;
       cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
     }
 
     .secondary {
       border: 1px solid var(--line);
-      background: #ffffff;
+      background: rgba(255, 253, 249, 0.72);
       color: var(--accent-strong);
+      backdrop-filter: blur(12px);
     }
 
     .form {
@@ -454,8 +680,9 @@
       width: 100%;
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: #ffffff;
+      background: rgba(255, 253, 249, 0.82);
       color: var(--ink);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
     }
 
     textarea {
@@ -477,19 +704,23 @@
       display: none;
       min-height: 58vh;
       padding: clamp(24px, 4vw, 44px);
-      border: 1px solid rgba(80, 68, 48, 0.12);
+      border: 1px solid var(--line);
       border-radius: 10px;
       background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.92)),
+        radial-gradient(ellipse at 88% 0%, rgba(243, 223, 148, 0.26), transparent 42%),
+        linear-gradient(180deg, rgba(255, 253, 249, 0.76), rgba(255, 253, 249, 0.92)),
         var(--warm);
     }
 
     .activity-panel.is-visible {
-      display: block;
+      display: grid;
+      grid-template-columns: minmax(220px, 0.52fr) minmax(0, 1fr);
+      gap: clamp(26px, 5vw, 70px);
+      align-items: start;
     }
 
     .activity-copy {
-      max-width: 680px;
+      max-width: 320px;
       color: var(--muted);
     }
 
@@ -497,9 +728,25 @@
       max-width: 760px;
       margin-top: 22px;
       padding: 22px;
-      border: 1px solid rgba(80, 68, 48, 0.14);
+      border: 1px solid var(--line);
       border-radius: 8px;
-      background: rgba(255, 255, 255, 0.78);
+      background: rgba(255, 253, 249, 0.52);
+      backdrop-filter: blur(8px);
+    }
+
+    .form-shell {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .form-shell .field {
+      margin-bottom: 0;
+    }
+
+    .form-shell .field:nth-child(3),
+    .form-shell .actions {
+      grid-column: 1 / -1;
     }
 
     .helper {
@@ -511,29 +758,39 @@
     .result {
       display: none;
       margin-top: 22px;
-      padding: 18px;
-      border: 1px solid #cbded5;
+      min-height: 34vh;
+      padding: 28px;
+      border: 1px solid rgba(185, 120, 128, 0.24);
       border-radius: 8px;
-      background: var(--accent-soft);
+      background:
+        linear-gradient(135deg, rgba(241, 223, 228, 0.82), rgba(255, 253, 249, 0.74));
+      text-align: center;
     }
 
     .result.is-visible {
-      display: block;
+      display: grid;
+      place-items: center;
     }
 
     .result strong {
       display: block;
       margin-bottom: 8px;
+      font-size: clamp(26px, 4vw, 48px);
+      line-height: 1.18;
     }
 
     .ai-tool {
       display: none;
       margin-top: 22px;
       padding: 24px;
-      border: 1px solid rgba(80, 68, 48, 0.14);
+      border: 1px solid var(--line);
       border-radius: 10px;
-      background: rgba(255, 255, 255, 0.78);
+      background:
+        radial-gradient(ellipse at 100% 0%, rgba(216, 207, 223, 0.36), transparent 44%),
+        radial-gradient(ellipse at 0% 100%, rgba(223, 231, 199, 0.42), transparent 44%),
+        rgba(255, 253, 249, 0.8);
       box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
     }
 
     body.experiment-complete .ai-tool {
@@ -559,7 +816,7 @@
       padding: 16px;
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: #ffffff;
+      background: rgba(255, 253, 249, 0.82);
       color: var(--ink);
       white-space: pre-wrap;
     }
@@ -574,7 +831,7 @@
       margin-top: 14px;
       padding: 12px;
       border-radius: 8px;
-      background: #ffffff;
+      background: rgba(255, 253, 249, 0.82);
       color: var(--muted);
       font-size: 13px;
       white-space: pre-wrap;
@@ -584,6 +841,61 @@
       margin-top: 18px;
       color: var(--warn);
       font-size: 14px;
+    }
+
+    .hero,
+    .stage,
+    .consent-card,
+    .intro-panel,
+    .activity-panel,
+    .scene,
+    .ai-tool,
+    .research-panel {
+      box-shadow: var(--soft-shadow);
+    }
+
+    .consent-card,
+    .hero,
+    .stage,
+    .intro-panel,
+    .activity-panel,
+    .scene,
+    .research-panel,
+    .research-card,
+    .references-panel,
+    .form-shell,
+    .result,
+    .ai-tool,
+    .ai-output,
+    .data-box,
+    .consent-list li,
+    textarea,
+    select {
+      border-radius: 3px;
+    }
+
+    .primary,
+    .secondary,
+    .queue-button,
+    .scene-sign span,
+    .pill {
+      border-radius: 3px;
+      box-shadow: none;
+    }
+
+    .primary:hover,
+    .primary:focus-visible,
+    .secondary:hover,
+    .secondary:focus-visible,
+    .queue-button:hover,
+    .queue-button:focus-visible {
+      transform: none;
+    }
+
+    .hero-kicker,
+    .step,
+    .warning {
+      display: none;
     }
 
     @media (max-width: 820px) {
@@ -615,6 +927,15 @@
 
       .ai-grid {
         grid-template-columns: 1fr;
+      }
+
+      .activity-panel.is-visible,
+      .form-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .activity-copy {
+        max-width: none;
       }
 
       .queues {
@@ -650,33 +971,117 @@
         margin-top: 14px;
       }
     }
+
+    body.queue-active {
+      overflow: hidden;
+    }
+
+    body.queue-active .stage {
+      height: 100svh;
+      margin-top: 0;
+      border: 0;
+      border-radius: 0;
+    }
+
+    body.queue-active .experiment-area {
+      height: 100svh;
+      padding: clamp(10px, 2vw, 20px);
+      overflow: hidden;
+    }
+
+    body.queue-active .choice-scene {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    body.queue-active .stage-header {
+      flex: 0 0 auto;
+      margin-bottom: 10px;
+    }
+
+    body.queue-active .stage-header h2 {
+      margin-bottom: 4px;
+    }
+
+    body.queue-active .scene {
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    body.queue-active .queue-viewport {
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+
+    body.queue-active .queue-viewport canvas {
+      height: 100%;
+      min-height: 0;
+    }
+
+    body.queue-active .queues,
+    body.queue-active .choice-scene > .actions {
+      flex: 0 0 auto;
+    }
+
+    body.queue-active .choice-scene > .actions {
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
-  <main>
+  <section class="consent-screen" id="consentScreen" aria-labelledby="consent-title">
+    <div class="consent-card">
+      <h1 id="consent-title">知情同意</h1>
+      <p class="consent-lead">这是一个课堂小研究页面。继续之前，请先知道下面几件事：</p>
+
+      <ul class="consent-list">
+        <li>
+          <strong>匿名</strong>
+          <span>我们不会收集你的姓名、邮箱、联系方式等能认出你是谁的信息。</span>
+        </li>
+        <li>
+          <strong>自愿</strong>
+          <span>参不参加完全由你决定，没有对错，也不会影响你的任何事情。</span>
+        </li>
+        <li>
+          <strong>随时可退出</strong>
+          <span>中途不想继续了，直接关掉页面离开就可以。</span>
+        </li>
+        <li>
+          <strong>数据用途</strong>
+          <span>你的回答只用于这个课堂研究，不会拿去做别的用途。</span>
+        </li>
+      </ul>
+
+      <p class="consent-note">点击“同意并继续”表示你已经读过这些说明，并愿意继续体验。</p>
+
+      <div class="actions">
+        <button class="primary" id="consentAgreeBtn" type="button">同意并继续</button>
+      </div>
+    </div>
+  </section>
+
+  <main id="appContent" hidden>
     <section class="hero">
-      <p class="hero-kicker">校园活动入口体验</p>
       <h1>你快到活动门口了</h1>
       <p class="lead">这是一个很短的进场小体验。你会看到活动入口的现场画面，请像真的到场一样，选择自己会站到的位置。</p>
-      <div class="quick-facts" aria-label="体验说明">
-        <span class="pill">大约 1 分钟</span>
-        <span class="pill">按第一反应完成</span>
-        <span class="pill">结束后留下简单反馈</span>
+      <div class="actions">
+        <button class="primary" id="startBtn" type="button">开始 1 分钟体验</button>
       </div>
     </section>
 
     <section class="stage" aria-labelledby="experiment-title">
       <div class="intro-panel" id="introPanel">
-        <div class="step">开始前</div>
         <h2>准备进入现场</h2>
         <p class="intro-copy">
           画面开始后，请把自己想象成刚到活动门口的同学。请不要想太久，按第一反应选择你会站到的位置。
         </p>
-        <p class="auto-start">
-          准备好后点击开始。完成选择后，会有几个很短的问题记录你的体验感受。
-        </p>
         <div class="actions">
-          <button class="primary" id="startBtn" type="button">开始 1 分钟体验</button>
+          <button class="primary" id="introStartBtn" type="button">开始 1 分钟体验</button>
         </div>
       </div>
 
@@ -684,7 +1089,6 @@
         <div class="choice-scene" id="choiceScene">
           <div class="stage-header">
             <div>
-              <div class="step">现场选择</div>
               <h2 id="experiment-title">现场</h2>
               <p class="helper">你走到门口。请按第一反应选一个你会站的位置。</p>
             </div>
@@ -705,9 +1109,10 @@
         </div>
 
         <div class="activity-panel" id="activityPanel">
-          <div class="step">体验反馈</div>
-          <h2>你已经进入活动现场</h2>
-          <p class="activity-copy">老师正在收集同学们刚才进场时的选择感受。请按你刚才的印象回答。</p>
+          <div class="activity-intro">
+            <h2>你已经进入活动现场</h2>
+            <p class="activity-copy">老师正在收集同学们刚才进场时的选择感受。请按你刚才的印象回答。</p>
+          </div>
 
           <form class="form" id="feedbackForm">
             <div class="form-shell">
@@ -738,13 +1143,7 @@
         </div>
 
         <div class="result" id="result" aria-live="polite">
-          <strong id="resultTitle">已记录本次反馈</strong>
-          <p class="helper" id="resultHelper">这份记录会提交到研究数据库。</p>
-          <div class="actions">
-            <button class="secondary" id="copyBtn" type="button">复制本次记录</button>
-            <button class="secondary" id="downloadBtn" type="button">下载 JSON</button>
-          </div>
-          <pre class="data-box" id="dataBox"></pre>
+          <strong id="resultTitle">已成功提交，感谢参与！</strong>
         </div>
 
         <div class="research-toggle" id="researchReveal">
@@ -786,6 +1185,7 @@
 
           <div class="actions">
             <button class="secondary" id="referencesToggle" type="button" aria-expanded="false" aria-controls="referencesPanel">References</button>
+            <a class="secondary" href="/tool">打开队伍设计工具</a>
           </div>
           <div class="references-panel" id="referencesPanel">
             <h2>References used in this project</h2>
@@ -801,38 +1201,31 @@
       </div>
     </section>
 
-    <section class="ai-tool" aria-labelledby="ai-tool-title">
-      <div class="step">Researcher Tool</div>
-      <h2 id="ai-tool-title">队伍设计建议</h2>
-      <p class="helper">这是研究设计辅助工具，不是参与者问卷的一部分。输入一个排队场景和目标，AI 会生成一版可测试的队伍布局；真实实验数据还没有接入。</p>
-
-      <div class="ai-grid">
-        <div class="field">
-          <label for="aiScenario">场景</label>
-          <textarea id="aiScenario" placeholder="例如：校园讲座签到处，三个入口都能进，学生只看到队伍长度。"></textarea>
-        </div>
-        <div class="field">
-          <label for="aiGoal">目标</label>
-          <select id="aiGoal">
-            <option value="让 A 队看起来人更多">让 A 队人更多</option>
-            <option value="让 B 队看起来人更多">让 B 队人更多</option>
-            <option value="让 C 队看起来人更多">让 C 队人更多</option>
-            <option value="三条队伍看起来一样多">三条队一样多</option>
-            <option value="让整体等待时间最少">整体等待时间最少</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="actions">
-        <button class="primary" id="aiGenerateBtn" type="button">生成建议</button>
-      </div>
-      <div class="ai-output is-muted" id="aiOutput">生成结果会显示在这里。</div>
-    </section>
-
     <p class="warning">
-      隐私说明：这个页面不收集姓名、邮箱或联系方式。你的反馈会用于后续统计整理。
+      隐私说明：这个页面不收集姓名、邮箱或联系方式。你的回答只用于这个课堂研究。
     </p>
   </main>
+
+  <script>
+    const consentScreen = document.getElementById("consentScreen");
+    const appContent = document.getElementById("appContent");
+    const consentAgreeBtn = document.getElementById("consentAgreeBtn");
+    const consentKey = "queueExperienceConsentAccepted";
+
+    function showAppContent() {
+      consentScreen.hidden = true;
+      appContent.hidden = false;
+    }
+
+    if (sessionStorage.getItem(consentKey) === "true") {
+      showAppContent();
+    }
+
+    consentAgreeBtn.addEventListener("click", () => {
+      sessionStorage.setItem(consentKey, "true");
+      showAppContent();
+    });
+  </script>
 
   <script type="module">
     let THREE = null;
@@ -850,6 +1243,7 @@
     const introPanel = document.getElementById("introPanel");
     const experimentArea = document.getElementById("experimentArea");
     const startBtn = document.getElementById("startBtn");
+    const introStartBtn = document.getElementById("introStartBtn");
     const choiceScene = document.getElementById("choiceScene");
     const activityPanel = document.getElementById("activityPanel");
     const queuesEl = document.getElementById("queues");
@@ -865,19 +1259,11 @@
     const resetBtn = document.getElementById("resetBtn");
     const resultEl = document.getElementById("result");
     const resultTitle = document.getElementById("resultTitle");
-    const resultHelper = document.getElementById("resultHelper");
-    const dataBox = document.getElementById("dataBox");
-    const copyBtn = document.getElementById("copyBtn");
-    const downloadBtn = document.getElementById("downloadBtn");
     const researchReveal = document.getElementById("researchReveal");
     const researchToggle = document.getElementById("researchToggle");
     const researchPanel = document.getElementById("researchPanel");
     const referencesToggle = document.getElementById("referencesToggle");
     const referencesPanel = document.getElementById("referencesPanel");
-    const aiScenarioEl = document.getElementById("aiScenario");
-    const aiGoalEl = document.getElementById("aiGoal");
-    const aiGenerateBtn = document.getElementById("aiGenerateBtn");
-    const aiOutput = document.getElementById("aiOutput");
 
     let crowdedQueue = "";
     let selectedQueue = "";
@@ -952,12 +1338,12 @@
         alpha: false,
         powerPreference: "low-power"
       });
-      renderer.setClearColor(0xf4efe4, 1);
+      renderer.setClearColor(0xf6eee8, 1);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
 
       const scene = new THREE.Scene();
-      scene.background = new THREE.Color(0xf4efe4);
-      scene.fog = new THREE.Fog(0xf4efe4, 16, 52);
+      scene.background = new THREE.Color(0xf6eee8);
+      scene.fog = new THREE.Fog(0xf6eee8, 16, 52);
 
       const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 80);
       camera.position.set(0, 2.75, 13.6);
@@ -976,18 +1362,18 @@
         { label: "C", x: 3.8 }
       ];
 
-      const floorMat = new THREE.MeshLambertMaterial({ color: 0xd8cbb5 });
-      const laneMat = new THREE.MeshLambertMaterial({ color: 0xc5b599 });
-      const wallMat = new THREE.MeshLambertMaterial({ color: 0xf7f4eb });
-      const doorMat = new THREE.MeshLambertMaterial({ color: 0x2f6f5e });
-      const postMat = new THREE.MeshLambertMaterial({ color: 0x7f725d });
-      const bodyMat = new THREE.MeshLambertMaterial({ color: 0x2f6f5e });
-      const headMat = new THREE.MeshLambertMaterial({ color: 0xf0c7a5 });
-      const selectedMat = new THREE.MeshBasicMaterial({ color: 0xfff4b8, transparent: true, opacity: 0.72 });
+      const floorMat = new THREE.MeshLambertMaterial({ color: 0xe7dccf });
+      const laneMat = new THREE.MeshLambertMaterial({ color: 0xded1dd });
+      const wallMat = new THREE.MeshLambertMaterial({ color: 0xfffbf4 });
+      const doorMat = new THREE.MeshLambertMaterial({ color: 0x5a464c });
+      const postMat = new THREE.MeshLambertMaterial({ color: 0x9b8580 });
+      const bodyMat = new THREE.MeshLambertMaterial({ color: 0x57434a });
+      const headMat = new THREE.MeshLambertMaterial({ color: 0xe8b5a7 });
+      const selectedMat = new THREE.MeshBasicMaterial({ color: 0xf3df94, transparent: true, opacity: 0.7 });
 
-      const hemi = new THREE.HemisphereLight(0xffffff, 0xb8aa92, 2.4);
+      const hemi = new THREE.HemisphereLight(0xfffdf7, 0xd8c9bd, 2.35);
       scene.add(hemi);
-      const sun = new THREE.DirectionalLight(0xffffff, 1.6);
+      const sun = new THREE.DirectionalLight(0xfffbf0, 1.55);
       sun.position.set(-4, 8, 6);
       scene.add(sun);
 
@@ -1003,17 +1389,17 @@
         labelCanvas.width = 256;
         labelCanvas.height = 128;
         const ctx = labelCanvas.getContext("2d");
-        ctx.fillStyle = "rgba(255,255,255,0.92)";
+        ctx.fillStyle = "rgba(255,253,249,0.93)";
         if (typeof ctx.roundRect === "function") {
           ctx.roundRect(18, 18, 220, 92, 18);
         } else {
           ctx.rect(18, 18, 220, 92);
         }
         ctx.fill();
-        ctx.strokeStyle = "rgba(47,111,94,0.38)";
+        ctx.strokeStyle = "rgba(185,120,128,0.34)";
         ctx.lineWidth = 5;
         ctx.stroke();
-        ctx.fillStyle = "#22332d";
+        ctx.fillStyle = "#2f2a2c";
         ctx.font = "700 58px Arial, sans-serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
@@ -1181,7 +1567,8 @@
     function startExperiment(mode) {
       clearAutoStartTimer();
       startMode = mode;
-      document.body.classList.add("experiment-running");
+      document.body.classList.remove("intro-visible");
+      document.body.classList.add("experiment-running", "queue-active");
       introPanel.classList.add("is-hidden");
       experimentArea.classList.add("is-visible");
       renderScene();
@@ -1190,9 +1577,18 @@
       experimentArea.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
+    function showIntroPage() {
+      document.body.classList.remove("experiment-running", "experiment-complete", "queue-active");
+      document.body.classList.add("intro-visible");
+      experimentArea.classList.remove("is-visible");
+      introPanel.classList.remove("is-hidden");
+      introPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
     function resetToIntro() {
       clearAutoStartTimer();
-      document.body.classList.remove("experiment-running");
+      document.body.classList.remove("experiment-running", "queue-active");
+      document.body.classList.add("intro-visible");
       experimentArea.classList.remove("is-visible");
       introPanel.classList.remove("is-hidden");
       renderScene();
@@ -1203,16 +1599,13 @@
       latestRecord = record;
       localStorage.setItem("queueMvpLastRecord", JSON.stringify(record));
       if (record.submission_status === "saved_to_supabase") {
-        resultTitle.textContent = "已提交反馈";
-        resultHelper.textContent = "谢谢！这条反馈已经记录下来，之后会和其他反馈一起整理。";
+        resultTitle.textContent = "已成功提交，感谢参与！";
       } else if (record.submission_status === "local_only_supabase_failed") {
-        resultTitle.textContent = "暂时没有提交成功";
-        resultHelper.textContent = "网络连接暂时失败，这条记录已先保存在本机。你可以复制或下载 JSON 作为备份。";
+        resultTitle.textContent = "暂时没有提交成功，请稍后再试。";
       } else {
-        resultTitle.textContent = "已记录本次反馈";
-        resultHelper.textContent = "这份反馈会用于后续统计整理。";
+        resultTitle.textContent = "已成功提交，感谢参与！";
       }
-      dataBox.textContent = JSON.stringify(record, null, 2);
+      document.body.classList.remove("queue-active");
       document.body.classList.add("experiment-complete");
       resultEl.classList.add("is-visible");
       researchReveal.classList.add("is-visible");
@@ -1263,13 +1656,15 @@
     }
 
     continueBtn.addEventListener("click", () => {
+      document.body.classList.remove("queue-active");
       choiceScene.classList.add("is-hidden");
       activityPanel.classList.add("is-visible");
       form.classList.add("is-visible");
       activityPanel.scrollIntoView({ behavior: "smooth", block: "start" });
     });
 
-    startBtn.addEventListener("click", () => startExperiment("manual"));
+    startBtn.addEventListener("click", showIntroPage);
+    introStartBtn.addEventListener("click", () => startExperiment("manual"));
     resetBtn.addEventListener("click", resetToIntro);
 
     form.addEventListener("submit", async (event) => {
@@ -1311,31 +1706,6 @@
       }
     });
 
-    copyBtn.addEventListener("click", async () => {
-      if (!latestRecord) return;
-      const text = JSON.stringify(latestRecord, null, 2);
-      try {
-        await navigator.clipboard.writeText(text);
-        copyBtn.textContent = "已复制";
-      } catch (error) {
-        dataBox.textContent = text;
-        copyBtn.textContent = "请手动复制";
-      }
-      setTimeout(() => {
-        copyBtn.textContent = "复制本次记录";
-      }, 1600);
-    });
-
-    downloadBtn.addEventListener("click", () => {
-      if (!latestRecord) return;
-      const blob = new Blob([JSON.stringify(latestRecord, null, 2)], { type: "application/json" });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "queue-feedback.json";
-      link.click();
-      URL.revokeObjectURL(link.href);
-    });
-
     researchToggle.addEventListener("click", () => {
       const isOpen = researchPanel.classList.toggle("is-visible");
       researchToggle.setAttribute("aria-expanded", String(isOpen));
@@ -1346,42 +1716,6 @@
       const isOpen = referencesPanel.classList.toggle("is-visible");
       referencesToggle.setAttribute("aria-expanded", String(isOpen));
       referencesToggle.textContent = isOpen ? "Hide references" : "References";
-    });
-
-    aiGenerateBtn.addEventListener("click", async () => {
-      const scenario = aiScenarioEl.value.trim();
-      const goal = aiGoalEl.value;
-
-      if (!scenario) {
-        aiOutput.textContent = "请先写一个场景。";
-        aiOutput.classList.add("is-muted");
-        return;
-      }
-
-      aiGenerateBtn.disabled = true;
-      aiOutput.textContent = "正在生成建议……";
-      aiOutput.classList.add("is-muted");
-
-      try {
-        const response = await fetch("/api/chat", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ scenario, goal })
-        });
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.error || "请求失败。");
-        }
-
-        aiOutput.textContent = data.answer || "DeepSeek 没有返回内容。";
-        aiOutput.classList.remove("is-muted");
-      } catch (error) {
-        aiOutput.textContent = `没有调通：${error.message}\n\n如果这是线上页面，请检查 Vercel 里是否已经添加服务器环境变量。`;
-        aiOutput.classList.add("is-muted");
-      } finally {
-        aiGenerateBtn.disabled = false;
-      }
     });
 
     renderScene();

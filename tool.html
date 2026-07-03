@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>队伍设计工具</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f8f3ee;
+      --ink: #252321;
+      --muted: #706b66;
+      --line: rgba(54, 48, 44, 0.14);
+      --panel: rgba(255, 253, 249, 0.78);
+      --warm: #f4ece3;
+      --shadow: 0 8px 22px rgba(74, 58, 54, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      overflow-x: hidden;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Noto Serif SC", "Songti SC", SimSun, serif;
+      line-height: 1.65;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: -24vh -18vw auto;
+      height: 92vh;
+      z-index: -2;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse at 18% 34%, rgba(232, 176, 169, 0.42), transparent 42%),
+        radial-gradient(ellipse at 82% 16%, rgba(216, 207, 223, 0.48), transparent 44%),
+        radial-gradient(ellipse at 68% 72%, rgba(223, 231, 199, 0.62), transparent 48%),
+        conic-gradient(from 118deg at 52% 42%, rgba(255, 255, 255, 0), rgba(243, 223, 148, 0.34), rgba(255, 255, 255, 0.26), rgba(185, 120, 128, 0.22), rgba(255, 255, 255, 0));
+      filter: blur(10px) saturate(108%);
+      transform: rotate(-4deg);
+    }
+
+    main {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: clamp(24px, 4vw, 52px) 0 64px;
+    }
+
+    .tool-shell {
+      min-height: calc(100vh - 104px);
+      padding: clamp(26px, 5vw, 56px);
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      background:
+        radial-gradient(ellipse at 100% 0%, rgba(216, 207, 223, 0.36), transparent 44%),
+        radial-gradient(ellipse at 0% 100%, rgba(223, 231, 199, 0.42), transparent 44%),
+        rgba(255, 253, 249, 0.8);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .topline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: clamp(28px, 5vw, 58px);
+    }
+
+    h1 {
+      max-width: 680px;
+      margin: 0;
+      font-size: clamp(40px, 6vw, 82px);
+      line-height: 1.02;
+      font-weight: 800;
+    }
+
+    .helper {
+      max-width: 620px;
+      margin: 18px 0 0;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .tool-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+      gap: clamp(22px, 4vw, 48px);
+      margin-top: clamp(34px, 5vw, 64px);
+      align-items: start;
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      background: rgba(255, 253, 249, 0.72);
+      color: var(--ink);
+      font: inherit;
+    }
+
+    textarea {
+      min-height: 180px;
+      padding: 12px;
+      resize: vertical;
+    }
+
+    select {
+      min-height: 46px;
+      padding: 8px 10px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .primary,
+    .secondary {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 17px;
+      border-radius: 3px;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 720;
+      text-decoration: none;
+    }
+
+    .primary {
+      border: 1px solid #41383b;
+      background: #2f2a2c;
+      color: #fffdfa;
+    }
+
+    .primary:disabled {
+      border-color: var(--line);
+      background: #d8d2ce;
+      color: #837d78;
+      cursor: not-allowed;
+    }
+
+    .secondary {
+      border: 1px solid var(--line);
+      background: rgba(255, 253, 249, 0.72);
+      color: #57434a;
+    }
+
+    .ai-output {
+      min-height: 360px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      background: rgba(255, 253, 249, 0.62);
+      color: var(--ink);
+      white-space: pre-wrap;
+    }
+
+    .ai-output.is-muted {
+      color: var(--muted);
+    }
+
+    @media (max-width: 820px) {
+      main {
+        width: min(100% - 24px, 1180px);
+      }
+
+      .tool-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .topline {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="tool-shell">
+      <div class="topline">
+        <div>
+          <h1>队伍设计建议</h1>
+          <p class="helper">这是研究设计辅助工具，不是参与者问卷的一部分。输入一个排队场景和目标，AI 会生成一版可测试的队伍布局；真实实验数据还没有接入。</p>
+        </div>
+        <a class="secondary" href="/index">返回体验页</a>
+      </div>
+
+      <div class="tool-grid">
+        <div>
+          <div class="field">
+            <label for="aiScenario">场景</label>
+            <textarea id="aiScenario" placeholder="例如：校园讲座签到处，三个入口都能进，学生只看到队伍长度。"></textarea>
+          </div>
+          <div class="field">
+            <label for="aiGoal">目标</label>
+            <select id="aiGoal">
+              <option value="让 A 队看起来人更多">让 A 队人更多</option>
+              <option value="让 B 队看起来人更多">让 B 队人更多</option>
+              <option value="让 C 队看起来人更多">让 C 队人更多</option>
+              <option value="三条队伍看起来一样多">三条队一样多</option>
+              <option value="让整体等待时间最少">整体等待时间最少</option>
+            </select>
+          </div>
+          <div class="actions">
+            <button class="primary" id="aiGenerateBtn" type="button">生成建议</button>
+          </div>
+        </div>
+
+        <div class="ai-output is-muted" id="aiOutput">生成结果会显示在这里。</div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const aiScenarioEl = document.getElementById("aiScenario");
+    const aiGoalEl = document.getElementById("aiGoal");
+    const aiGenerateBtn = document.getElementById("aiGenerateBtn");
+    const aiOutput = document.getElementById("aiOutput");
+
+    aiGenerateBtn.addEventListener("click", async () => {
+      const scenario = aiScenarioEl.value.trim();
+      const goal = aiGoalEl.value;
+
+      if (!scenario) {
+        aiOutput.textContent = "请先写一个场景。";
+        aiOutput.classList.add("is-muted");
+        return;
+      }
+
+      aiGenerateBtn.disabled = true;
+      aiOutput.textContent = "正在生成建议……";
+      aiOutput.classList.add("is-muted");
+
+      try {
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ scenario, goal })
+        });
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "请求失败。");
+        }
+
+        aiOutput.textContent = data.answer || "DeepSeek 没有返回内容。";
+        aiOutput.classList.remove("is-muted");
+      } catch (error) {
+        aiOutput.textContent = `没有调通：${error.message}\n\n如果这是线上页面，请检查 Vercel 里是否已经添加服务器环境变量。`;
+        aiOutput.classList.add("is-muted");
+      } finally {
+        aiGenerateBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
