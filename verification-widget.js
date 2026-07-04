@@ -398,7 +398,7 @@
       <section class="qv-dialog">
         <div class="qv-security">
           <span class="qv-shield" aria-hidden="true"></span>
-          <span>安全验证</span>
+          <span>Safety Verification</span>
         </div>
         <div class="qv-head">
           <h1 id="qv-title">请选择你认为正确的队伍</h1>
