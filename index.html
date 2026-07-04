@@ -1217,6 +1217,8 @@
     const consentAgreeBtn = document.getElementById("consentAgreeBtn");
     const consentKey = "queueExperienceConsentAccepted";
     const verificationKey = "queueExperienceVerificationPassed";
+    const verificationReturnKey = "queueExperienceVerificationReturn";
+    const verificationRecordKey = "queueExperienceVerificationRecord";
 
     function showAppContent() {
       consentScreen.hidden = true;
@@ -1237,15 +1239,24 @@
       routeTo("verification");
     }
 
-    if (sessionStorage.getItem(consentKey) === "true") {
-      if (sessionStorage.getItem(verificationKey) === "true") {
-        showAppContent();
-      } else {
-        goToVerification();
-      }
+    if (
+      sessionStorage.getItem(consentKey) === "true" &&
+      sessionStorage.getItem(verificationKey) === "true" &&
+      sessionStorage.getItem(verificationReturnKey) === "true"
+    ) {
+      sessionStorage.removeItem(verificationReturnKey);
+      showAppContent();
+    } else {
+      sessionStorage.removeItem(consentKey);
+      sessionStorage.removeItem(verificationKey);
+      sessionStorage.removeItem(verificationReturnKey);
+      sessionStorage.removeItem(verificationRecordKey);
     }
 
     consentAgreeBtn.addEventListener("click", () => {
+      sessionStorage.removeItem(verificationKey);
+      sessionStorage.removeItem(verificationReturnKey);
+      sessionStorage.removeItem(verificationRecordKey);
       sessionStorage.setItem(consentKey, "true");
       goToVerification();
     });
