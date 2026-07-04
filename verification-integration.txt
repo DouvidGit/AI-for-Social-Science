@@ -1,0 +1,66 @@
+给 AI Agent 的任务：
+
+请在当前网站里嵌入一个现成的人机验证组件。不要重新设计页面，不要改验证逻辑，不要让本网站配置 Supabase。直接使用下面这个远程脚本：
+
+https://doudoulu.com/verification-widget.js
+
+目标效果：
+
+1. 用户打开网站时，先看到安全验证弹窗。
+2. 弹窗样式、交互、队伍图案、加载过程都由 verification-widget.js 提供，不需要你重新设计。
+3. 验证题目固定为“请选择你认为正确的队伍”。
+4. 每次随机出现两种条件之一：
+   - balanced_control_4_4_4：A/B/C 都是 4 人。
+   - crowd_signal_3_4_12：A/B/C 是 3/4/12，12 人的长队位置随机。
+5. 用户点击任意队伍后才能点“验证”。
+6. 点验证后显示“验证中”，题目消失，转圈，然后出现“已通过”，最后关闭弹窗并继续进入原网站。
+7. 验证数据会自动提交到 https://doudoulu.com/api/verification-events，由 doudoulu.com 写入它自己的 Supabase。你不要配置自己的 Supabase，也不要把任何 Supabase key 写进你的网站。
+
+最简单接入方式：
+
+把下面这段代码放进主页面的 </body> 前。如果是 React/Vue/Next 等项目，也可以放到全局 layout 里，确保每次用户进入页面都会加载。
+
+<script
+  src="https://doudoulu.com/verification-widget.js"
+  data-partner-site="请把这里改成你的网站名或你的名字"
+  defer
+></script>
+
+如果网站需要等验证通过后再显示主要内容，可以把主要内容先隐藏，然后监听事件：
+
+<script>
+  document.documentElement.classList.add("waiting-for-queue-verification");
+  window.addEventListener("queueVerificationPassed", function () {
+    document.documentElement.classList.remove("waiting-for-queue-verification");
+  });
+</script>
+
+<style>
+  .waiting-for-queue-verification body > *:not(#queue-verification-widget-root) {
+    visibility: hidden;
+  }
+</style>
+
+注意：
+
+- 不要改 verification-widget.js 里的视觉设计。
+- 不要提前告诉用户这是研究任务。
+- 不要在你的网站里新增 Supabase 配置。
+- partner_site 一定要改成能识别你网站来源的名字，比如 "alice-game-site"。
+- 如果你的页面有严格的 Content Security Policy，需要允许加载 https://doudoulu.com/verification-widget.js，并允许向 https://doudoulu.com/api/verification-events 发起 POST。
+
+验证完成后，doudoulu.com 的 Supabase 会收到这些字段：
+
+- partner_site
+- partner_page_url
+- participant_session_id
+- condition
+- selected_queue
+- crowded_queue
+- queue_counts
+- selected_crowded_queue
+- response_time_seconds
+- started_at
+- selected_at
+- user_agent
+- raw_payload
