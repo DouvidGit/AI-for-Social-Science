@@ -675,6 +675,12 @@
       font-weight: 720;
     }
 
+    .required-mark {
+      color: var(--accent);
+      font-weight: 800;
+      margin-right: 4px;
+    }
+
     textarea,
     select {
       width: 100%;
@@ -1117,16 +1123,16 @@
           <form class="form" id="feedbackForm">
             <div class="form-shell">
               <div class="field">
-                <label for="reason" id="reasonLabel">你为什么选择这条队？</label>
-                <textarea id="reason" name="reason" placeholder="写下你的真实想法就好。"></textarea>
+                <label for="reason" id="reasonLabel"><span class="required-mark">*</span>你为什么选择这条队？</label>
+                <textarea id="reason" name="reason" placeholder="写下你的真实想法就好。" required></textarea>
               </div>
               <div class="field">
-                <label for="avoidReason">你有没有特别不想选的队？为什么？</label>
-                <textarea id="avoidReason" name="avoidReason" placeholder="可以写没有，也可以写你排除某条队的原因。"></textarea>
+                <label for="avoidReason"><span class="required-mark">*</span>你有没有特别不想选的队？为什么？</label>
+                <textarea id="avoidReason" name="avoidReason" placeholder="可以写没有，也可以写你排除某条队的原因。" required></textarea>
               </div>
               <div class="field">
-                <label for="perceivedMost">凭印象看，刚才哪条队人最多？</label>
-                <select id="perceivedMost" name="perceivedMost">
+                <label for="perceivedMost"><span class="required-mark">*</span>凭印象看，刚才哪条队人最多？</label>
+                <select id="perceivedMost" name="perceivedMost" required>
                   <option value="">请选择</option>
                   <option value="A">A 队</option>
                   <option value="B">B 队</option>
@@ -1333,7 +1339,7 @@
         item.classList.toggle("is-selected", isSelected);
         item.querySelector(".queue-hint").textContent = isSelected ? "已选择" : "站到这里";
       });
-      reasonLabel.textContent = `你为什么选择 ${selectedQueue} 队？`;
+      reasonLabel.innerHTML = `<span class="required-mark">*</span>你为什么选择 ${selectedQueue} 队？`;
       continueBtn.disabled = false;
       if (queue3d) {
         queue3d.select(label);
@@ -1574,7 +1580,7 @@
       referencesToggle.setAttribute("aria-expanded", "false");
       researchToggle.textContent = "研究 / The research";
       referencesToggle.textContent = "References";
-      reasonLabel.textContent = "你为什么选择这条队？";
+      reasonLabel.innerHTML = `<span class="required-mark">*</span>你为什么选择这条队？`;
       reasonEl.value = "";
       avoidReasonEl.value = "";
       perceivedMostEl.value = "";
