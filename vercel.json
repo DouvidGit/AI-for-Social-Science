@@ -8,6 +8,10 @@
     {
       "source": "/tool",
       "destination": "/tool.html"
+    },
+    {
+      "source": "/verification",
+      "destination": "/verification.html"
     }
   ]
 }

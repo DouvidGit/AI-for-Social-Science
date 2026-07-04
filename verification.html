@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>安全验证</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --page: #ffffff;
+      --panel: #ffffff;
+      --ink: #202124;
+      --muted: #5f6368;
+      --line: #e5e5e5;
+      --captcha-blue: #4a90e2;
+      --captcha-blue-dark: #3c7fc8;
+      font-family: Arial, "Microsoft YaHei", "PingFang SC", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      background: var(--page);
+      color: var(--ink);
+      display: grid;
+      place-items: center;
+      padding: 16px;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .verify-dialog {
+      width: min(100%, 520px);
+      border: 4px solid #2f9ac6;
+      background: var(--panel);
+    }
+
+    body.is-page-waiting .verify-dialog {
+      display: none;
+    }
+
+    .security-strip {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 10px 12px 8px;
+      color: #303134;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .shield-icon {
+      width: 25px;
+      height: 28px;
+      border: 2px solid var(--captcha-blue);
+      border-radius: 8px 8px 10px 10px;
+      position: relative;
+      flex: 0 0 auto;
+    }
+
+    .shield-icon::before {
+      content: "";
+      position: absolute;
+      inset: 7px 8px;
+      border-right: 2px solid var(--captcha-blue);
+      border-bottom: 2px solid var(--captcha-blue);
+      transform: rotate(38deg);
+    }
+
+    .dialog-head {
+      margin: 0 8px;
+      padding: 26px 32px 24px;
+      background: var(--captcha-blue);
+      color: #fff;
+    }
+
+    .dialog-title h1 {
+      margin: 0;
+      font-size: 30px;
+      line-height: 1.18;
+      font-weight: 700;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+
+    .dialog-title p {
+      margin: 6px 0 0;
+      color: rgba(255, 255, 255, 0.92);
+      font-size: 16px;
+      line-height: 1.35;
+    }
+
+    .dialog-body {
+      padding: 8px;
+    }
+
+    .loading-panel {
+      min-height: 294px;
+      display: none;
+      place-items: center;
+      background: #fff;
+    }
+
+    body.is-loading .loading-panel {
+      display: grid;
+    }
+
+    body.is-submitting .loading-panel {
+      display: grid;
+    }
+
+    body.is-loading .challenge,
+    body.is-loading .dialog-foot,
+    body.is-submitting .challenge,
+    body.is-submitting .dialog-foot,
+    body.is-passed .challenge,
+    body.is-passed .dialog-foot,
+    body.is-passed .loading-panel {
+      display: none;
+    }
+
+    .loading-spinner {
+      width: 46px;
+      height: 46px;
+      border: 5px solid #e7e7e7;
+      border-top-color: var(--captcha-blue);
+      border-radius: 50%;
+      animation: spin 760ms linear infinite;
+    }
+
+    .success-panel {
+      min-height: 294px;
+      display: none;
+      place-items: center;
+      background: #fff;
+      color: #303134;
+      font-size: 36px;
+      font-weight: 700;
+    }
+
+    body.is-passed .success-panel {
+      display: grid;
+    }
+
+    .challenge {
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .challenge-title {
+      display: none;
+    }
+
+    .queue-options {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 4px;
+      padding: 0;
+    }
+
+    .queue-option {
+      min-width: 0;
+      min-height: 176px;
+      padding: 8px 6px;
+      border: 0;
+      background: #f7f7f7;
+      color: var(--ink);
+      cursor: pointer;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 8px;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .queue-option:hover,
+    .queue-option:focus-visible {
+      box-shadow: inset 0 0 0 1px var(--captcha-blue);
+      outline: none;
+    }
+
+    .queue-option.is-selected {
+      box-shadow: inset 0 0 0 2px var(--captcha-blue);
+    }
+
+    .queue-label {
+      color: #303134;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .queue-track {
+      position: relative;
+      width: 100%;
+      min-width: 0;
+      min-height: 126px;
+      border: 1px solid #e2e2e2;
+      background:
+        linear-gradient(90deg, rgba(220, 220, 220, 0.28), transparent 46%, rgba(220, 220, 220, 0.28)),
+        #fff;
+      overflow: hidden;
+    }
+
+    .gate {
+      position: absolute;
+      left: 50%;
+      bottom: 5px;
+      transform: translateX(-50%);
+      width: 34px;
+      height: 14px;
+      border: 1px solid #9aa0a6;
+      background: #f1f3f4;
+    }
+
+    .person {
+      position: absolute;
+      left: 50%;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      border: 1px solid rgba(32, 33, 36, 0.16);
+      background: #6f7f8f;
+      transform: translateX(-50%);
+    }
+
+    .person:nth-child(2n) {
+      background: #8a7d74;
+    }
+
+    .person:nth-child(3n) {
+      background: #617b6e;
+    }
+
+    .dialog-foot {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 96px;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 8px 8px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .verify-button {
+      min-width: 96px;
+      min-height: 42px;
+      border: 0;
+      background: var(--captcha-blue);
+      color: #fff;
+      cursor: pointer;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .verify-button:hover:not(:disabled),
+    .verify-button:focus-visible:not(:disabled) {
+      background: var(--captcha-blue-dark);
+      outline: none;
+    }
+
+    .verify-button:disabled {
+      background: #d8d8d8;
+      color: #8b9096;
+      cursor: not-allowed;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @media (max-width: 520px) {
+      body {
+        padding: 8px;
+        justify-items: start;
+      }
+
+      .verify-dialog {
+        width: min(calc(100vw - 16px), 374px);
+        border-width: 3px;
+      }
+
+      .security-strip {
+        padding: 8px 10px 7px;
+      }
+
+      .dialog-head {
+        margin: 0 6px;
+        padding: 20px 20px 18px;
+      }
+
+      .dialog-title h1 {
+        font-size: 22px;
+      }
+
+      .dialog-title p {
+        font-size: 14px;
+      }
+
+      .dialog-body {
+        padding: 6px;
+      }
+
+      .loading-panel {
+        min-height: 250px;
+      }
+
+      .success-panel {
+        min-height: 250px;
+        font-size: 32px;
+      }
+
+      .queue-options {
+        gap: 0;
+      }
+
+      .queue-option {
+        min-height: 136px;
+        padding: 7px 4px;
+        gap: 6px;
+      }
+
+      .queue-label {
+        font-size: 12px;
+      }
+
+      .queue-track {
+        min-height: 96px;
+      }
+
+      .person {
+        width: 10px;
+        height: 10px;
+      }
+
+      .gate {
+        width: 28px;
+        height: 11px;
+      }
+
+      .dialog-foot {
+        grid-template-columns: minmax(0, 1fr) 78px;
+        gap: 8px;
+        padding-left: 6px;
+        padding-right: 6px;
+      }
+
+      .verify-button {
+        min-width: 78px;
+      }
+    }
+  </style>
+</head>
+<body class="is-page-waiting is-loading">
+  <section class="verify-dialog" id="verifyDialog" aria-labelledby="verifyTitle" aria-live="polite">
+    <div class="security-strip">
+      <span class="shield-icon" aria-hidden="true"></span>
+      <span>安全验证</span>
+    </div>
+    <div class="dialog-head">
+      <div class="dialog-title">
+        <h1 id="verifyTitle">请选择你认为正确的队伍</h1>
+        <p>选择后点击验证。</p>
+      </div>
+    </div>
+
+    <div class="dialog-body">
+      <div class="loading-panel" id="loadingPanel" aria-hidden="true">
+        <span class="loading-spinner"></span>
+      </div>
+
+      <div class="challenge">
+        <div class="challenge-title">请选择你认为正确的队伍。</div>
+        <div class="queue-options" id="queueOptions" role="radiogroup" aria-label="选择正确的队伍"></div>
+      </div>
+
+      <div class="success-panel" id="successPanel">已通过</div>
+    </div>
+
+    <div class="dialog-foot">
+      <span></span>
+      <button class="verify-button" id="verifyButton" type="button" disabled>验证</button>
+    </div>
+  </section>
+
+  <script>
+    const consentKey = "queueExperienceConsentAccepted";
+    const verificationKey = "queueExperienceVerificationPassed";
+    const recordKey = "queueExperienceVerificationRecord";
+    const queueLabels = ["A", "B", "C"];
+    let startedAt = performance.now();
+    let startedAtIso = new Date().toISOString();
+    let selectedQueue = null;
+    let isComplete = false;
+
+    const queueOptions = document.getElementById("queueOptions");
+    const verifyButton = document.getElementById("verifyButton");
+    const verifyDialog = document.getElementById("verifyDialog");
+
+    function routeTo(page) {
+      const isLocalFile = window.location.protocol === "file:";
+      const usesHtmlPath = window.location.pathname.endsWith(".html");
+      if (isLocalFile || usesHtmlPath) {
+        window.location.href = `${page}.html`;
+        return;
+      }
+      window.location.href = `/${page}`;
+    }
+
+    if (sessionStorage.getItem(consentKey) !== "true") {
+      routeTo("index");
+    } else if (sessionStorage.getItem(verificationKey) === "true") {
+      routeTo("index");
+    }
+
+    function buildCondition() {
+      const condition = Math.random() < 0.5 ? "crowd_signal_3_4_12" : "balanced_control_4_4_4";
+      const crowdedIndex = Math.floor(Math.random() * queueLabels.length);
+      const counts = {};
+
+      if (condition === "crowd_signal_3_4_12") {
+        const shorterCounts = [3, 4];
+        queueLabels.forEach((label, index) => {
+          counts[label] = index === crowdedIndex ? 12 : shorterCounts.shift();
+        });
+      } else {
+        queueLabels.forEach((label) => {
+          counts[label] = 4;
+        });
+      }
+
+      return {
+        condition,
+        crowdedQueue: condition === "crowd_signal_3_4_12" ? queueLabels[crowdedIndex] : null,
+        counts
+      };
+    }
+
+    const task = buildCondition();
+
+    function personStyle(index, count) {
+      const isMobile = window.matchMedia("(max-width: 520px)").matches;
+      const bottomStep = isMobile ? 6 : 8;
+      const sideStep = isMobile ? 5 : 7;
+      const bottom = (isMobile ? 18 : 23) + index * bottomStep;
+      const offset = count > 8
+        ? [-sideStep, sideStep, 0][index % 3]
+        : (index % 2 === 0 ? -sideStep : sideStep);
+      return `bottom: ${bottom}px; margin-left: ${offset}px`;
+    }
+
+    function renderPeople(count) {
+      const people = [];
+      for (let index = 0; index < count; index += 1) {
+        people.push(`<span class="person" style="${personStyle(index, count)}"></span>`);
+      }
+      return people.join("");
+    }
+
+    function renderQueues() {
+      queueOptions.innerHTML = queueLabels.map((label) => `
+        <button class="queue-option" type="button" role="radio" aria-checked="false" data-queue="${label}">
+          <span class="queue-label">队伍 ${label}</span>
+          <span class="queue-track" aria-hidden="true">
+            <span class="gate"></span>
+            ${renderPeople(task.counts[label])}
+          </span>
+        </button>
+      `).join("");
+    }
+
+    function chooseQueue(queue) {
+      if (isComplete || document.body.classList.contains("is-loading")) return;
+      selectedQueue = queue;
+      verifyButton.disabled = false;
+      document.querySelectorAll(".queue-option").forEach((option) => {
+        const isSelected = option.dataset.queue === queue;
+        option.classList.toggle("is-selected", isSelected);
+        option.setAttribute("aria-checked", String(isSelected));
+      });
+    }
+
+    function completeVerification() {
+      if (!selectedQueue || isComplete) return;
+      isComplete = true;
+      verifyButton.disabled = true;
+      verifyDialog.classList.add("is-checking");
+      verifyButton.textContent = "验证中";
+      document.body.classList.add("is-submitting");
+
+      const responseTime = Number(((performance.now() - startedAt) / 1000).toFixed(2));
+      const record = {
+        task_type: "human_verification_cover",
+        prompt: "请选择你认为正确的队伍。",
+        condition: task.condition,
+        selected_queue: selectedQueue,
+        crowded_queue: task.crowdedQueue,
+        queue_counts: task.counts,
+        selected_crowded_queue: task.crowdedQueue ? selectedQueue === task.crowdedQueue : null,
+        response_time_seconds: responseTime,
+        started_at: startedAtIso,
+        selected_at: new Date().toISOString(),
+        page_url: window.location.href
+      };
+
+      sessionStorage.setItem(recordKey, JSON.stringify(record));
+
+      window.setTimeout(() => {
+        verifyDialog.classList.remove("is-checking");
+        document.body.classList.remove("is-submitting");
+        verifyDialog.classList.add("is-passed");
+        document.body.classList.add("is-passed");
+        sessionStorage.setItem(verificationKey, "true");
+      }, 720);
+
+      window.setTimeout(() => {
+        routeTo("index");
+      }, 1500);
+    }
+
+    window.setTimeout(() => {
+      document.body.classList.remove("is-page-waiting");
+      window.setTimeout(() => {
+        renderQueues();
+        startedAt = performance.now();
+        startedAtIso = new Date().toISOString();
+        document.body.classList.remove("is-loading");
+      }, 850);
+    }, 1000);
+
+    queueOptions.addEventListener("click", (event) => {
+      const option = event.target.closest(".queue-option");
+      if (!option) return;
+      chooseQueue(option.dataset.queue);
+    });
+
+    verifyButton.addEventListener("click", completeVerification);
+  </script>
+</body>
+</html>

@@ -1172,6 +1172,11 @@
               <p>The page records the selected line, the crowded line, whether the crowded line was chosen, response time, and a short reason.</p>
             </article>
             <article class="research-card">
+              <h2>验证任务说明</h2>
+              <p>进入正式页面前的“安全验证”也是研究任务的一部分。它用一个很短的选择题观察：当答案不明确时，人们会不会把更多人选择的队伍当成“更可能正确”的信号。</p>
+              <p>这个设计是为了减少提前暴露研究目的带来的影响；所有记录仍然是匿名的，只用于课堂研究。</p>
+            </article>
+            <article class="research-card">
               <h2>期待的初步发现</h2>
               <p>The user study has not run yet. I expect some users to choose the crowded line because it feels more reliable or more likely to be correct.</p>
               <p>I also expect some users to choose shorter lines because they care more about speed.</p>
@@ -1211,19 +1216,38 @@
     const appContent = document.getElementById("appContent");
     const consentAgreeBtn = document.getElementById("consentAgreeBtn");
     const consentKey = "queueExperienceConsentAccepted";
+    const verificationKey = "queueExperienceVerificationPassed";
 
     function showAppContent() {
       consentScreen.hidden = true;
       appContent.hidden = false;
     }
 
+    function routeTo(page) {
+      const isLocalFile = window.location.protocol === "file:";
+      const usesHtmlPath = window.location.pathname.endsWith(".html");
+      if (isLocalFile || usesHtmlPath) {
+        window.location.href = `${page}.html`;
+        return;
+      }
+      window.location.href = `/${page}`;
+    }
+
+    function goToVerification() {
+      routeTo("verification");
+    }
+
     if (sessionStorage.getItem(consentKey) === "true") {
-      showAppContent();
+      if (sessionStorage.getItem(verificationKey) === "true") {
+        showAppContent();
+      } else {
+        goToVerification();
+      }
     }
 
     consentAgreeBtn.addEventListener("click", () => {
       sessionStorage.setItem(consentKey, "true");
-      showAppContent();
+      goToVerification();
     });
   </script>
 
@@ -1564,6 +1588,14 @@
       }
     }
 
+    function getVerificationRecord() {
+      try {
+        return JSON.parse(sessionStorage.getItem("queueExperienceVerificationRecord") || "null");
+      } catch (error) {
+        return null;
+      }
+    }
+
     function startExperiment(mode) {
       clearAutoStartTimer();
       startMode = mode;
@@ -1612,8 +1644,10 @@
       resultEl.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
-    function buildSupabaseRow(record) {
-      return {
+    function buildSupabaseRow(record, options = {}) {
+      const includeVerificationFields = options.includeVerificationFields !== false;
+      const verification = record.verification_task || {};
+      const row = {
         client_created_at: record.created_at,
         project: record.project,
         condition: record.condition,
@@ -1635,9 +1669,23 @@
         page_url: window.location.href,
         raw_payload: record
       };
+
+      if (includeVerificationFields) {
+        row.verification_task_type = verification.task_type ?? null;
+        row.verification_condition = verification.condition ?? null;
+        row.verification_selected_queue = verification.selected_queue ?? null;
+        row.verification_crowded_queue = verification.crowded_queue ?? null;
+        row.verification_queue_counts = verification.queue_counts ?? null;
+        row.verification_selected_crowded_queue = verification.selected_crowded_queue ?? null;
+        row.verification_response_time_seconds = verification.response_time_seconds ?? null;
+        row.verification_started_at = verification.started_at ?? null;
+        row.verification_selected_at = verification.selected_at ?? null;
+      }
+
+      return row;
     }
 
-    async function saveToSupabase(record) {
+    async function postSupabaseRow(row) {
       const response = await fetch(`${SUPABASE_URL}/rest/v1/queue_responses`, {
         method: "POST",
         headers: {
@@ -1646,12 +1694,24 @@
           "content-type": "application/json",
           "prefer": "return=minimal"
         },
-        body: JSON.stringify(buildSupabaseRow(record))
+        body: JSON.stringify(row)
       });
 
       if (!response.ok) {
         const message = await response.text();
         throw new Error(message || `Supabase error ${response.status}`);
+      }
+    }
+
+    async function saveToSupabase(record) {
+      try {
+        await postSupabaseRow(buildSupabaseRow(record));
+      } catch (error) {
+        const message = String(error?.message || "");
+        if (!message.includes("verification_")) {
+          throw error;
+        }
+        await postSupabaseRow(buildSupabaseRow(record, { includeVerificationFields: false }));
       }
     }
 
@@ -1669,10 +1729,12 @@
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
+      const verificationRecord = getVerificationRecord();
       const record = {
         project: "queue_choice_simulation",
         condition: "crowded_vs_short",
         start_mode: startMode,
+        verification_task: verificationRecord,
         scene_started_at: sceneStartedAtIso,
         selected_at: selectedAtIso,
         selected_queue: selectedQueue,
