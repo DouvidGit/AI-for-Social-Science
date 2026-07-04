@@ -6,7 +6,7 @@ https://doudoulu.com/verification-widget.js
 
 目标效果：
 
-1. 用户打开网站时，先看到安全验证弹窗。
+1. 用户打开网站时，先看到标题为 “Safety Verification” 的验证弹窗。
 2. 弹窗样式、交互、队伍图案、加载过程都由 verification-widget.js 提供，不需要你重新设计。
 3. 验证题目固定为“请选择你认为正确的队伍”。
 4. 每次随机出现两种条件之一：
