@@ -1,4 +1,4 @@
-function sendJson(res, status, data) {
+﻿function sendJson(res, status, data) {
   res.statusCode = status;
   res.setHeader("content-type", "application/json; charset=utf-8");
   res.setHeader("cache-control", "no-store");
@@ -67,7 +67,7 @@ async function postToSupabase(row) {
   const supabaseUrl = process.env.SUPABASE_URL || "https://ubjlmjpawywldzrvedvk.supabase.co";
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY ||
     process.env.SUPABASE_ANON_KEY ||
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXAiOiJ1YmpobG1qcGF3eXdsZHpydmVkdmsiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc4MDc4MzEwMiwiZXhwIjoyMDk2MzU5MTAyfQ.UGThz_KRuTEYwaRFkT41tFJaGmV1TmWvuThzpcRNMF8";
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InViamxtanBhd3l3bGR6cnZlZHZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3ODMxMDIsImV4cCI6MjA5NjM1OTEwMn0.UGThz_KRuTEYwaRFkT41tFJaGmV1TmWvuThzpcRNMF8";
 
   if (!supabaseUrl || !supabaseKey) {
     throw new Error("Missing Supabase configuration.");
@@ -110,3 +110,4 @@ module.exports = async function handler(req, res) {
     sendJson(res, 500, { ok: false, error: error.message || "Unexpected server error." });
   }
 };
+
