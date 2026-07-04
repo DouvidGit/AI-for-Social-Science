@@ -394,6 +394,7 @@
   <script>
     const consentKey = "queueExperienceConsentAccepted";
     const verificationKey = "queueExperienceVerificationPassed";
+    const verificationReturnKey = "queueExperienceVerificationReturn";
     const recordKey = "queueExperienceVerificationRecord";
     const queueLabels = ["A", "B", "C"];
     let startedAt = performance.now();
@@ -519,6 +520,7 @@
         verifyDialog.classList.add("is-passed");
         document.body.classList.add("is-passed");
         sessionStorage.setItem(verificationKey, "true");
+        sessionStorage.setItem(verificationReturnKey, "true");
       }, 720);
 
       window.setTimeout(() => {
