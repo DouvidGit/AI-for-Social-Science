@@ -1225,46 +1225,30 @@
     const verificationKey = "queueExperienceVerificationPassed";
     const verificationReturnKey = "queueExperienceVerificationReturn";
     const verificationRecordKey = "queueExperienceVerificationRecord";
+    const consentAcceptedEvent = "queueExperienceConsentAccepted";
 
     function showAppContent() {
       consentScreen.hidden = true;
       appContent.hidden = false;
     }
 
-    function routeTo(page) {
-      const isLocalFile = window.location.protocol === "file:";
-      const usesHtmlPath = window.location.pathname.endsWith(".html");
-      if (isLocalFile || usesHtmlPath) {
-        window.location.href = `${page}.html`;
-        return;
-      }
-      window.location.href = `/${page}`;
-    }
-
-    function goToVerification() {
-      routeTo("verification");
-    }
-
-    if (
-      sessionStorage.getItem(consentKey) === "true" &&
-      sessionStorage.getItem(verificationKey) === "true" &&
-      sessionStorage.getItem(verificationReturnKey) === "true"
-    ) {
-      sessionStorage.removeItem(verificationReturnKey);
+    function enterConsentedFlow() {
+      sessionStorage.setItem(consentKey, "true");
+      window.queueExperienceConsentFlowReady = true;
       showAppContent();
-    } else {
-      sessionStorage.removeItem(consentKey);
-      sessionStorage.removeItem(verificationKey);
-      sessionStorage.removeItem(verificationReturnKey);
-      sessionStorage.removeItem(verificationRecordKey);
+      window.dispatchEvent(new CustomEvent(consentAcceptedEvent));
     }
+
+    sessionStorage.removeItem(consentKey);
+    sessionStorage.removeItem(verificationKey);
+    sessionStorage.removeItem(verificationReturnKey);
+    sessionStorage.removeItem(verificationRecordKey);
 
     consentAgreeBtn.addEventListener("click", () => {
       sessionStorage.removeItem(verificationKey);
       sessionStorage.removeItem(verificationReturnKey);
       sessionStorage.removeItem(verificationRecordKey);
-      sessionStorage.setItem(consentKey, "true");
-      goToVerification();
+      enterConsentedFlow();
     });
   </script>
 
@@ -1798,6 +1782,10 @@
     });
 
     renderScene();
+    window.addEventListener("queueExperienceConsentAccepted", () => startExperiment("manual"));
+    if (window.queueExperienceConsentFlowReady) {
+      startExperiment("manual");
+    }
   </script>
   <script>
     window.va = window.va || function () {
