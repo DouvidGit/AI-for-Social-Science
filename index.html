@@ -1225,7 +1225,6 @@
     const verificationKey = "queueExperienceVerificationPassed";
     const verificationReturnKey = "queueExperienceVerificationReturn";
     const verificationRecordKey = "queueExperienceVerificationRecord";
-    const consentAcceptedEvent = "queueExperienceConsentAccepted";
 
     function showAppContent() {
       consentScreen.hidden = true;
@@ -1234,9 +1233,7 @@
 
     function enterConsentedFlow() {
       sessionStorage.setItem(consentKey, "true");
-      window.queueExperienceConsentFlowReady = true;
       showAppContent();
-      window.dispatchEvent(new CustomEvent(consentAcceptedEvent));
     }
 
     sessionStorage.removeItem(consentKey);
@@ -1782,10 +1779,6 @@
     });
 
     renderScene();
-    window.addEventListener("queueExperienceConsentAccepted", () => startExperiment("manual"));
-    if (window.queueExperienceConsentFlowReady) {
-      startExperiment("manual");
-    }
   </script>
   <script>
     window.va = window.va || function () {
