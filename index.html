@@ -1419,8 +1419,8 @@
       return queueLabels[Math.floor(Math.random() * queueLabels.length)];
     }
 
-    function pickExperimentAssignment() {
-      timingCondition = Math.random() < 0.5 ? "untimed" : "timed_2s";
+    function pickExperimentAssignment(options = {}) {
+      timingCondition = options.forceTimingCondition || (Math.random() < 0.5 ? "untimed" : "timed_2s");
       queueLayoutCondition = Math.random() < 0.5 ? "balanced_4_4_4" : "crowded_vs_short_3_4_12";
       experimentCondition = `${timingCondition}_${queueLayoutCondition}`;
     }
@@ -1793,11 +1793,11 @@
       experimentArea.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
-    function startExperiment(mode) {
+    function startExperiment(mode, options = {}) {
       clearAutoStartTimer();
       clearDeadlineTimer();
       startMode = mode;
-      pickExperimentAssignment();
+      pickExperimentAssignment(options);
       document.body.classList.remove("intro-visible");
       document.body.classList.add("experiment-running", "queue-active");
       introPanel.classList.add("is-hidden");
@@ -1953,7 +1953,7 @@
     startBtn.addEventListener("click", showIntroPage);
     introStartBtn.addEventListener("click", () => startExperiment("manual"));
     timedBriefingBtn.addEventListener("click", launchQueueScene);
-    retryBtn.addEventListener("click", () => startExperiment("retry"));
+    retryBtn.addEventListener("click", () => startExperiment("retry", { forceTimingCondition: "timed_2s" }));
     resetBtn.addEventListener("click", resetToIntro);
 
     form.addEventListener("submit", async (event) => {
