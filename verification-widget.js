@@ -1,7 +1,7 @@
 (function () {
   const script = document.currentScript;
   const partnerSite = script?.dataset?.partnerSite || window.location.hostname || "unknown_partner";
-  const apiUrl = script?.dataset?.apiUrl || "https://doudoulu.com/api/verification-events";
+  const apiUrl = script?.dataset?.apiUrl || "https://www.doudoulu.com/api/verification-events";
   const rootId = "queue-verification-widget-root";
 
   if (document.getElementById(rootId)) return;
