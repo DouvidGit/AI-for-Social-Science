@@ -604,6 +604,69 @@
       opacity: 1;
     }
 
+    .deadline-strip {
+      display: none;
+      min-width: 150px;
+      padding: 8px 12px;
+      border: 1px solid rgba(185, 120, 128, 0.28);
+      background: rgba(255, 253, 249, 0.84);
+      color: var(--accent-strong);
+      text-align: right;
+    }
+
+    .deadline-strip.is-visible {
+      display: grid;
+      gap: 2px;
+    }
+
+    .deadline-strip span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    .deadline-strip strong {
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .timed-briefing,
+    .timeout-panel {
+      min-height: min(680px, calc(100svh - 40px));
+      padding: clamp(28px, 6vw, 72px);
+      border: 1px solid var(--line);
+      background:
+        radial-gradient(ellipse at 78% 12%, rgba(243, 223, 148, 0.3), transparent 42%),
+        linear-gradient(145deg, rgba(255, 253, 249, 0.92), rgba(248, 241, 235, 0.64)),
+        var(--warm);
+    }
+
+    .timed-briefing:not([hidden]),
+    .timeout-panel:not([hidden]) {
+      display: grid;
+      place-items: center;
+    }
+
+    .timed-briefing-inner,
+    .timeout-panel-inner {
+      width: min(760px, 100%);
+    }
+
+    .timed-briefing h2,
+    .timeout-panel h2 {
+      max-width: 720px;
+      margin-bottom: 14px;
+      font-size: clamp(34px, 7vw, 80px);
+      line-height: 1.02;
+    }
+
+    .timed-briefing p,
+    .timeout-panel p {
+      max-width: 620px;
+      color: var(--muted);
+      font-size: clamp(17px, 2vw, 22px);
+    }
+
     .actions {
       display: flex;
       flex-wrap: wrap;
@@ -1002,6 +1065,10 @@
       min-height: 0;
     }
 
+    body.queue-active .choice-scene.is-hidden {
+      display: none;
+    }
+
     body.queue-active .stage-header {
       flex: 0 0 auto;
       margin-bottom: 10px;
@@ -1092,11 +1159,25 @@
       </div>
 
       <div class="experiment-area" id="experimentArea">
+        <div class="timed-briefing" id="timedBriefing" hidden>
+          <div class="timed-briefing-inner">
+            <h2>请准备快速选择</h2>
+            <p>等一下场景出现后，你需要在 1 秒内选定一条队伍。请凭第一反应点击你会站的位置。</p>
+            <div class="actions">
+              <button class="primary" id="timedBriefingBtn" type="button">我准备好了</button>
+            </div>
+          </div>
+        </div>
+
         <div class="choice-scene" id="choiceScene">
           <div class="stage-header">
             <div>
               <h2 id="experiment-title">现场</h2>
               <p class="helper">你走到门口。请按第一反应选一个你会站的位置。</p>
+            </div>
+            <div class="deadline-strip" id="deadlineStrip" aria-live="polite">
+              <span>剩余选择时间</span>
+              <strong id="deadlineValue">1.0</strong>
             </div>
           </div>
 
@@ -1111,6 +1192,16 @@
 
           <div class="actions">
             <button class="primary" id="continueBtn" type="button" disabled>确认选择并进入活动</button>
+          </div>
+        </div>
+
+        <div class="timeout-panel" id="timeoutPanel" hidden>
+          <div class="timeout-panel-inner">
+            <h2>选择超时了</h2>
+            <p>这一组需要在场景出现后的 1 秒内做出选择。请再来一次。</p>
+            <div class="actions">
+              <button class="primary" id="retryBtn" type="button">再来一次</button>
+            </div>
           </div>
         </div>
 
@@ -1262,11 +1353,19 @@
     const queueLabels = ["A", "B", "C"];
     const crowdedCount = 12;
     const quietCounts = [3, 4];
+    const balancedCount = 4;
+    const responseDeadlineMs = 1000;
     const introPanel = document.getElementById("introPanel");
     const experimentArea = document.getElementById("experimentArea");
     const startBtn = document.getElementById("startBtn");
     const introStartBtn = document.getElementById("introStartBtn");
+    const timedBriefing = document.getElementById("timedBriefing");
+    const timedBriefingBtn = document.getElementById("timedBriefingBtn");
     const choiceScene = document.getElementById("choiceScene");
+    const deadlineStrip = document.getElementById("deadlineStrip");
+    const deadlineValue = document.getElementById("deadlineValue");
+    const timeoutPanel = document.getElementById("timeoutPanel");
+    const retryBtn = document.getElementById("retryBtn");
     const activityPanel = document.getElementById("activityPanel");
     const queuesEl = document.getElementById("queues");
     const queueCanvas = document.getElementById("queueCanvas");
@@ -1295,6 +1394,12 @@
     let selectedAt = 0;
     let selectedAtIso = "";
     let startMode = "manual";
+    let timingCondition = "untimed";
+    let queueLayoutCondition = "crowded_vs_short_3_4_12";
+    let experimentCondition = "untimed_crowded_vs_short_3_4_12";
+    let deadlineFailed = false;
+    let deadlineTimer = null;
+    let deadlineExpiresAt = 0;
     let autoStartTimer = null;
     let latestRecord = null;
     let queue3d = null;
@@ -1303,7 +1408,22 @@
       return queueLabels[Math.floor(Math.random() * queueLabels.length)];
     }
 
+    function pickExperimentAssignment() {
+      timingCondition = Math.random() < 0.5 ? "untimed" : "timed_1s";
+      queueLayoutCondition = Math.random() < 0.5 ? "balanced_4_4_4" : "crowded_vs_short_3_4_12";
+      experimentCondition = `${timingCondition}_${queueLayoutCondition}`;
+    }
+
     function getCounts() {
+      if (queueLayoutCondition === "balanced_4_4_4") {
+        crowdedQueue = "";
+        return queueLabels.reduce((counts, label) => {
+          counts[label] = balancedCount;
+          return counts;
+        }, {});
+      }
+
+      crowdedQueue = pickCrowdedQueue();
       const quiet = [...quietCounts].sort(() => Math.random() - 0.5);
       return queueLabels.reduce((counts, label) => {
         counts[label] = label === crowdedQueue ? crowdedCount : quiet.pop();
@@ -1312,9 +1432,15 @@
     }
 
     function setSelectedQueue(label) {
+      if (deadlineFailed) return;
+      if (timingCondition === "timed_1s" && selectedQueue) return;
       selectedQueue = label;
       selectedAt = performance.now();
       selectedAtIso = new Date().toISOString();
+      clearDeadlineTimer();
+      if (timingCondition === "timed_1s") {
+        deadlineValue.textContent = "已选";
+      }
       document.querySelectorAll(".queue-button").forEach((item) => {
         const isSelected = item.dataset.queue === label;
         item.classList.toggle("is-selected", isSelected);
@@ -1544,12 +1670,14 @@
     }
 
     function renderScene() {
-      crowdedQueue = pickCrowdedQueue();
       selectedQueue = "";
       selectedAt = 0;
       selectedAtIso = "";
+      deadlineFailed = false;
       continueBtn.disabled = true;
       document.body.classList.remove("experiment-complete");
+      timedBriefing.hidden = true;
+      timeoutPanel.hidden = true;
       choiceScene.classList.remove("is-hidden");
       activityPanel.classList.remove("is-visible");
       form.classList.remove("is-visible");
@@ -1568,6 +1696,8 @@
 
       const counts = getCounts();
       currentCounts = counts;
+      deadlineStrip.classList.toggle("is-visible", timingCondition === "timed_1s");
+      deadlineValue.textContent = "1.0";
       renderQueueControls();
       if (!queue3d) {
         queue3d = createQueue3d(queueCanvas, setSelectedQueue);
@@ -1586,6 +1716,39 @@
       }
     }
 
+    function clearDeadlineTimer() {
+      if (deadlineTimer) {
+        clearInterval(deadlineTimer);
+        deadlineTimer = null;
+      }
+    }
+
+    function showTimeoutPanel() {
+      if (selectedQueue || deadlineFailed) return;
+      deadlineFailed = true;
+      clearDeadlineTimer();
+      continueBtn.disabled = true;
+      choiceScene.classList.add("is-hidden");
+      timeoutPanel.hidden = false;
+      timeoutPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function updateDeadline() {
+      const remainingMs = Math.max(0, deadlineExpiresAt - performance.now());
+      deadlineValue.textContent = (remainingMs / 1000).toFixed(1);
+      if (remainingMs <= 0) {
+        showTimeoutPanel();
+      }
+    }
+
+    function startDeadlineTimer() {
+      if (timingCondition !== "timed_1s") return;
+      clearDeadlineTimer();
+      deadlineExpiresAt = performance.now() + responseDeadlineMs;
+      updateDeadline();
+      deadlineTimer = setInterval(updateDeadline, 50);
+    }
+
     function getVerificationRecord() {
       try {
         return JSON.parse(sessionStorage.getItem("queueExperienceVerificationRecord") || "null");
@@ -1594,34 +1757,60 @@
       }
     }
 
+    function launchQueueScene() {
+      clearDeadlineTimer();
+      renderScene();
+      sceneStartedAt = performance.now();
+      sceneStartedAtIso = new Date().toISOString();
+      startDeadlineTimer();
+      experimentArea.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function showTimedBriefing() {
+      timedBriefing.hidden = false;
+      choiceScene.classList.add("is-hidden");
+      timeoutPanel.hidden = true;
+      experimentArea.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
     function startExperiment(mode) {
       clearAutoStartTimer();
+      clearDeadlineTimer();
       startMode = mode;
+      pickExperimentAssignment();
       document.body.classList.remove("intro-visible");
       document.body.classList.add("experiment-running", "queue-active");
       introPanel.classList.add("is-hidden");
       experimentArea.classList.add("is-visible");
-      renderScene();
-      sceneStartedAt = performance.now();
-      sceneStartedAtIso = new Date().toISOString();
-      experimentArea.scrollIntoView({ behavior: "smooth", block: "start" });
+
+      if (timingCondition === "timed_1s") {
+        showTimedBriefing();
+        return;
+      }
+
+      launchQueueScene();
     }
 
     function showIntroPage() {
+      clearDeadlineTimer();
       document.body.classList.remove("experiment-running", "experiment-complete", "queue-active");
       document.body.classList.add("intro-visible");
       experimentArea.classList.remove("is-visible");
       introPanel.classList.remove("is-hidden");
+      timedBriefing.hidden = true;
+      timeoutPanel.hidden = true;
       introPanel.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
     function resetToIntro() {
       clearAutoStartTimer();
+      clearDeadlineTimer();
       document.body.classList.remove("experiment-running", "queue-active");
       document.body.classList.add("intro-visible");
       experimentArea.classList.remove("is-visible");
       introPanel.classList.remove("is-hidden");
-      renderScene();
+      timedBriefing.hidden = true;
+      timeoutPanel.hidden = true;
       introPanel.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
@@ -1714,6 +1903,7 @@
     }
 
     continueBtn.addEventListener("click", () => {
+      clearDeadlineTimer();
       document.body.classList.remove("queue-active");
       choiceScene.classList.add("is-hidden");
       activityPanel.classList.add("is-visible");
@@ -1723,24 +1913,31 @@
 
     startBtn.addEventListener("click", showIntroPage);
     introStartBtn.addEventListener("click", () => startExperiment("manual"));
+    timedBriefingBtn.addEventListener("click", launchQueueScene);
+    retryBtn.addEventListener("click", () => startExperiment("retry"));
     resetBtn.addEventListener("click", resetToIntro);
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
       const verificationRecord = getVerificationRecord();
+      const hasCrowdedQueue = Boolean(crowdedQueue);
       const record = {
         project: "queue_choice_simulation",
-        condition: "crowded_vs_short",
+        condition: experimentCondition,
+        timing_condition: timingCondition,
+        queue_layout_condition: queueLayoutCondition,
+        response_deadline_ms: timingCondition === "timed_1s" ? responseDeadlineMs : null,
+        deadline_failed: deadlineFailed,
         start_mode: startMode,
         verification_task: verificationRecord,
         scene_started_at: sceneStartedAtIso,
         selected_at: selectedAtIso,
         selected_queue: selectedQueue,
-        crowded_queue: crowdedQueue,
+        crowded_queue: crowdedQueue || null,
         queue_counts: currentCounts,
-        selected_crowded_queue: selectedQueue === crowdedQueue,
+        selected_crowded_queue: hasCrowdedQueue ? selectedQueue === crowdedQueue : null,
         perceived_most_crowded_queue: perceivedMostEl.value || "not_answered",
-        perceived_crowd_correct: perceivedMostEl.value ? perceivedMostEl.value === crowdedQueue : null,
+        perceived_crowd_correct: hasCrowdedQueue && perceivedMostEl.value ? perceivedMostEl.value === crowdedQueue : null,
         reason_text: reasonEl.value.trim(),
         avoid_reason_text: avoidReasonEl.value.trim(),
         response_time_seconds: Number(((selectedAt - sceneStartedAt) / 1000).toFixed(2)),
