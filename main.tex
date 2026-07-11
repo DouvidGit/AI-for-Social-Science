@@ -1,0 +1,224 @@
+\documentclass[stu,12pt,floatsintext]{apa7}
+
+\usepackage[american]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{mathptmx}
+\usepackage{url}
+
+% These definitions neutralize stale Overleaf auxiliary commands from earlier
+% bibliography experiments. They are harmless in a clean compile.
+\makeatletter
+\providecommand{\abx@aux@refcontext}[1]{}
+\providecommand{\abx@aux@cite}[2]{}
+\providecommand{\abx@aux@segm}[3]{}
+\providecommand{\abx@aux@read@bbl@mdfivesum}[1]{}
+\providecommand{\abx@aux@read@bblrerun}{}
+\makeatother
+
+\title{Everyone Lines Up There: Visible Queue Length and High School Students' Line Choice}
+\shorttitle{Visible Queue Length}
+\author{Zichen Lu}
+\duedate{July 11, 2026}
+\affiliation{[TODO: School]}
+\course{AI for Social Sciences}
+\professor{Lawted Wu}
+
+\abstract{Everyday queue choices create a tension between saving time and using other people's behavior as information. A common misconception is that joining a crowded line must reflect irrational conformity, even though a long line may also signal reliability, popularity, or correctness. Prior work on herding, informational cascades, social influence, observational learning, and queue psychology shows that visible social information can affect decisions, but fewer classroom-scale tools isolate queue length as an interactive visual cue. This paper reports \textit{Everyone Lines Up There}, an online queue-choice simulation in which participants chose among three entrance lines and explained their choices. Across 57 submissions, including 38 submissions in crowded-line conditions, participants more often avoided the crowded line than selected it. Written responses suggested that many participants interpreted crowding as a waiting-cost signal, while a smaller group interpreted it as a social or reliability signal. These preliminary results show that visible queue length carried competing meanings rather than a single conformity effect.}
+
+\keywords{queue choice, social influence, herding, waiting lines, high school students, online experiment}
+
+\begin{document}
+\maketitle
+
+People often make decisions before they know all the relevant facts. One familiar example occurs when a person arrives at an airport, a school event, a restaurant, or another public place and sees several possible lines. A short line may appear efficient, but a long line may appear safer, more popular, or more likely to be correct. The present study examined this ordinary but theoretically interesting problem: when multiple visible queues appear to lead to the same place, how does queue length affect which line high school students choose?
+
+The question matters because a visible crowd is not a neutral feature of an interface. It can become a social signal. Models of herd behavior argue that people may rationally follow others when other people's choices appear to contain information (Banerjee, 1992). The theory of informational cascades similarly explains how early public actions can shape later decisions, even when later decision makers have their own private impressions (Bikhchandani et al., 1992). Laboratory studies have shown that cascades can emerge in controlled decision tasks (Anderson \& Holt, 1997), and later work has emphasized the need to distinguish informational cascades from broader forms of herding (Celen \& Kariv, 2004). In online environments, visible popularity information can also change behavior: download counts can shape music choices (Salganik et al., 2006), early ratings can affect later ratings (Muchnik et al., 2013), and displayed restaurant choices can influence demand (Cai et al., 2009).
+
+Queue settings add an important complication. A long queue can indicate that many people trust an option, but it can also indicate that the option will require more waiting. Research on waiting lines suggests that queues are both temporal and social experiences: people do not only wait; they also compare their position with the positions of others (Zhou \& Soman, 2003). Therefore, choosing a long line should not be read simply as conformity, and avoiding a long line should not be read simply as independence. The same visual cue may create at least four possible interpretations: a cost signal, a reliability signal, a normality signal, and a spatial-default signal.
+
+The present study used a small online artifact to examine these competing interpretations. The original hypothesis was that when one line was visibly more crowded while other factors were held constant, participants would be more likely to choose the crowded line because they might treat other people's choices as a signal of reliability. After data collection, the analysis also examined the competing possibility that participants would avoid the crowded line because they would interpret crowding as waiting cost. The research question was: How do differences in visible queue length in an interactive online queue simulation affect high school students' line choice?
+
+\section{Method}
+
+\subsection{Participants}
+
+The dataset analyzed for this draft contained 57 submissions recorded in the Supabase table for the queue-choice experiment. These submissions should not yet be treated as 57 confirmed independent participants because the current implementation did not include a stable anonymous participant identifier. The intended participant population was high school students, but the exact recruitment source and eligibility screening procedure still need to be documented. Participants were recruited through [TODO: recruitment source and method, such as class link, QR code, group chat, or in-person sharing]. The main analytic distinction was between submissions assigned to crowded-line conditions and submissions assigned to balanced conditions.
+
+\subsection{Materials}
+
+The study used an online interactive artifact titled \textit{Everyone Lines Up There}. The artifact was deployed as a web-based queue-choice simulation. After an initial consent screen, participants entered a campus event entrance scenario. The screen displayed three selectable lines labeled A, B, and C. All three lines led to the same activity. In crowded-line versions, one line contained 12 visible people, while the other two lines contained 3 and 4 visible people. In balanced versions, all three lines contained 4 visible people. In crowded-line versions, the crowded line was randomly assigned to A, B, or C when the scene was rendered.
+
+Participants selected a line by clicking either the visual queue area or the corresponding line button. After confirming their choice, they completed a short feedback form. The page recorded the selected line, the crowded line when applicable, the displayed queue counts, whether the crowded line was selected, the time from scene onset to queue click, the participant's perceived most crowded line, written choice reason, written avoidance reason, device type, timestamp, page URL, and user agent. Records were submitted to Supabase when submission succeeded. If submission failed, the page showed a failure message and retained the latest record locally in the browser.
+
+A separate queue-design suggestion page was also deployed as a research-design support tool. This page was not part of the participant questionnaire. It used a curated prompt and, when the server environment was configured, called the DeepSeek API to generate queue-layout suggestions. It did not use participant data, make statistical predictions, or produce empirical results.
+
+\subsection{Measures}
+
+The primary dependent variable was whether a submission selected the crowded line in conditions where one crowded line was present. Secondary measures included selected line label, response time in seconds, whether the participant correctly identified the most crowded line, and the content of open-ended written explanations. The post-choice questionnaire included two open-ended prompts and one forced-choice perception item. Participants were asked why they chose the selected line, whether there was any line they especially did not want to choose and why, and which line they remembered as having the most people.
+
+\subsection{Design}
+
+The implemented design was an online randomized-position queue-choice design. The key independent variable was visible queue structure. In the crowded-line conditions, one line was visibly longer than the other two. In the balanced conditions, all three lines had the same visible length. Within crowded-line conditions, the crowded line's position was randomized across A, B, and C to reduce simple position bias. Later versions also distinguished between timed and untimed versions of the task. The timed versions gave participants a 2-second decision window, while the untimed versions allowed them to choose without that time pressure.
+
+The balanced condition was included because position itself could influence choice. If one line was selected more often even when all lines had equal length, then line position would be a potential confound in crowded-line conditions. For this reason, the analysis treated queue length, line position, timing, and written explanation as separate lenses rather than reducing the study to a single crowded-versus-not-crowded percentage.
+
+\subsection{Procedure}
+
+The first screen presented informed consent in plain language. The main content remained hidden until the participant clicked the agree-and-continue button. The consent text stated that participation was voluntary, anonymous, and limited to a classroom research purpose. It also stated that participants could exit at any time by closing the page. The activity was a non-clinical classroom simulation and did not collect names, email addresses, contact information, or other direct identifiers. The consent state was stored only in the participant's current browser session so that refreshing the page did not repeatedly show the consent screen during the same session.
+
+After consent, participants saw a brief start page and then a short instruction page asking them to imagine that they had just arrived at a campus activity entrance. They were asked to choose where they would stand based on their first reaction. The queue scene then appeared, and participants selected one of the three lines. After clicking the confirmation button, they answered the feedback questions and submitted their response. After submission, the page displayed a short thank-you message and allowed participants to reveal the research explanation.
+
+\subsection{Coding and Analysis}
+
+Open-ended responses were manually coded into primary categories based on the main reason expressed in the written response. The coding categories used in the current analysis were efficiency or shorter waiting time, spatial position or default preference, low attention or random choice, compromise or avoidance of extremes, crowd attraction or social signal, and joke or peer-oriented response. Because some responses could contain more than one motive, the current coding assigned a primary category for clear counting. The coding process should be treated as preliminary until [TODO: coder count, coding rules, and reliability procedure] are documented.
+
+The quantitative analysis used descriptive counts and proportions. The current draft reports the full set of 57 submissions, the subset of 38 submissions in crowded-line conditions, and the 19 submissions in balanced conditions. Because duplicate submissions and low-attention responses were identified, the results should be interpreted as preliminary. The analysis did not yet use a stable participant-level identifier, so it reported submissions rather than confirmed unique participants. No inferential test is reported in this draft because the current goal is to describe early patterns and identify design issues before treating the dataset as a final sample.
+
+\section{Results}
+
+\subsection{Dataset Structure}
+
+The Supabase snapshot analyzed on July 9, 2026 contained 57 main experiment submissions. Of these, 38 belonged to crowded-line conditions and 19 belonged to balanced conditions. The crowded-line submissions included older crowded-versus-short records and later timed or untimed versions with 3, 4, and 12 visible people across the three queues. The balanced submissions included timed and untimed versions with 4, 4, and 4 visible people. Table~\ref{tab:condition_counts} summarizes the analytic structure.
+
+\begin{table}
+\caption{Submission Counts by Experimental Condition}
+\centering
+\begin{tabular}{p{0.31\linewidth}rp{0.43\linewidth}}
+\hline
+Condition & Count & Meaning for analysis \\
+\hline
+Timed crowded vs. short & 15 & Crowded-line test with 2-second window \\
+Untimed crowded vs. short & 13 & Crowded-line test without time limit \\
+Earlier crowded vs. short & 10 & Earlier crowded-line version \\
+Timed balanced & 12 & Position-control condition with 2-second window \\
+Untimed balanced & 7 & Position-control condition without time limit \\
+\hline
+\end{tabular}
+\smallskip
+\noindent Note. Counts refer to submissions, not confirmed unique participants.
+\label{tab:condition_counts}
+\end{table}
+
+\subsection{Crowded-Line Choice}
+
+In the 38 crowded-line submissions, most participants avoided the crowded line. As shown in Table~\ref{tab:crowded_choice}, 7 submissions selected the crowded line and 31 submissions did not. This corresponds to 18.4\% crowded-line selection and 81.6\% shorter-line selection. This pattern did not support the original directional hypothesis that participants would more often select the crowded line as a reliability signal. Instead, the descriptive results suggested that the crowded line was more often interpreted as a waiting-cost signal.
+
+\begin{table}
+\caption{Crowded-Line Selection in Crowded-Line Conditions}
+\centering
+\begin{tabular}{lrr}
+\hline
+Choice outcome & Count & Percentage \\
+\hline
+Selected crowded line & 7 & 18.4\% \\
+Selected shorter line & 31 & 81.6\% \\
+\hline
+\end{tabular}
+\smallskip
+\noindent Note. The denominator is the 38 submissions in conditions with one visibly crowded line.
+\label{tab:crowded_choice}
+\end{table}
+
+Participants generally noticed the visual crowding. In the crowded-line conditions, 32 submissions correctly identified the most crowded line, while 6 submissions identified it incorrectly or inconsistently. Among submissions that correctly identified the crowded line, only 5 selected it and 27 avoided it. This means that the main pattern was not simply a perception failure. Most participants appeared to see the crowded line and then choose against it.
+
+\subsection{Position Preferences}
+
+The position of the crowded line also mattered. When A was crowded, 4 of 15 submissions selected A. When B was crowded, 1 of 10 submissions selected B. When C was crowded, 2 of 13 submissions selected C. In the balanced condition, where all three lines contained the same number of people, B was selected most often: 10 of 19 balanced submissions selected B, compared with 7 for A and 2 for C. This pattern suggests a possible middle-position or default-position preference. However, when B became visibly crowded, that position advantage appeared to be weaker than the cost of joining a long line.
+
+\begin{table}
+\caption{Selected Line in Balanced Conditions}
+\centering
+\begin{tabular}{lrr}
+\hline
+Selected line & Count & Percentage \\
+\hline
+A & 7 & 36.8\% \\
+B & 10 & 52.6\% \\
+C & 2 & 10.5\% \\
+\hline
+\end{tabular}
+\smallskip
+\noindent Note. In balanced conditions, all three lines displayed the same number of people.
+\label{tab:balanced_choices}
+\end{table}
+
+This position pattern is important because it changes how the crowded-line result should be interpreted. If there were no balanced condition, a high or low selection rate for B might be mistaken for a queue-length effect. The balanced condition suggests that participants may have brought a default preference for the middle line, but that this preference could be overridden when the middle line became crowded.
+
+\subsection{Response Time}
+
+Across all 57 submissions, the mean response time from queue scene onset to queue click was 3.48 seconds, and the median response time was 1.77 seconds. The shortest response time was 0.43 seconds and the longest was 22.98 seconds. Thirty-two submissions were completed within 2 seconds. These response-time patterns suggest that many choices were rapid and may have reflected first impressions, visual salience, queue length, and position preference rather than slow deliberation.
+
+The response-time distribution also suggests a methodological distinction between timed and untimed versions. The timed version can be interpreted as a rapid visual-judgment condition, but it may also increase noise if participants feel that they cannot see the scene clearly. The untimed version may better capture deliberate interpretation, but some untimed submissions were still very fast. Therefore, time pressure should be treated as a meaningful design feature rather than a simple technical setting.
+
+\subsection{Written Response Coding}
+
+Written explanations helped clarify the meaning participants assigned to queue length. Across all 57 submissions, the most common coding category was efficiency or shorter waiting time, which appeared in 29 submissions. Spatial position or default preference appeared in 10 submissions, low attention or random choice in 8 submissions, compromise or avoidance of extremes in 5 submissions, crowd attraction or social signal in 4 submissions, and joke or peer-oriented response in 1 submission. Table~\ref{tab:coding} reports the full coding distribution.
+
+\begin{table}
+\caption{Primary Coding Categories for Written Responses}
+\centering
+\begin{tabular}{lrr}
+\hline
+Primary category & Count & Percentage \\
+\hline
+Efficiency or shorter waiting time & 29 & 50.9\% \\
+Spatial position or default preference & 10 & 17.5\% \\
+Low attention or random choice & 8 & 14.0\% \\
+Compromise or avoidance of extremes & 5 & 8.8\% \\
+Crowd attraction or social signal & 4 & 7.0\% \\
+Joke or peer-oriented response & 1 & 1.8\% \\
+\hline
+\end{tabular}
+\smallskip
+\noindent Note. Each written response was assigned one primary code for this preliminary analysis.
+\label{tab:coding}
+\end{table}
+
+In the crowded-line subset, the relationship between written reasons and choices was especially informative. All 21 submissions coded as efficiency or shorter waiting time avoided the crowded line. All 4 submissions coded as crowd attraction or social signal selected the crowded line. This pattern suggests that the same visual cue supported different interpretations for different participants. For many participants, a long line meant delay. For a smaller group, it meant reliability, social energy, or attractiveness.
+
+\subsection{Mechanism Summary}
+
+The results point to four mechanisms rather than one. First, the strongest mechanism was cost: many participants treated the long line as slower, more crowded, or more troublesome. Second, a weaker but visible social-signal mechanism appeared among participants who treated crowding as reliability, popularity, or social energy. Third, several responses suggested a normality or compromise mechanism: some participants avoided both the longest and the shortest-looking options, preferring a line that felt neither too crowded nor too empty. Fourth, the balanced condition suggested a spatial-default mechanism, especially a possible preference for the middle line.
+
+\section{Discussion}
+
+The preliminary findings suggest that visible queue length affected line choice, but not in the direction originally expected. Instead of selecting the crowded line as a social proof cue, most submissions in crowded-line conditions avoided it. Written responses showed why: many participants described shorter lines as faster, easier, or less crowded. Thus, in this queue setting, the waiting-cost meaning of crowding appeared stronger than the social-proof meaning.
+
+This result does not mean that social influence was absent. A small number of responses explicitly treated crowding as a positive signal, using reasons such as reliability, social energy, or prior experience. The more precise conclusion is that visible crowding carried competing meanings. The long line could be read as evidence that other people trusted the option, but it could also be read as evidence that the option would take longer. In the current data, the cost interpretation was more common.
+
+The most interesting implication is that queue length is not a single independent psychological signal. In many online popularity contexts, a larger number can make an option look better. In a queue, however, a larger number can also make an option look worse because it implies delay. The present study therefore suggests a boundary condition for social proof: visible popularity may be less attractive when the same cue also imposes an obvious personal cost. This boundary condition helps explain why a long line may sometimes attract people and sometimes repel them.
+
+The balanced condition also revealed an important design issue. When all three lines had equal length, participants selected the middle line most often. This suggests that queue position itself was not neutral. A line's visual location may act as a default, especially when the queue-length signal is absent. Future analyses should therefore control for line position rather than assuming that A, B, and C are psychologically equivalent.
+
+The written responses add a second design insight. Some participants did not simply choose the shortest line. Instead, they preferred a line that felt moderate or normal. This suggests that a very short line may sometimes create uncertainty: if nobody is there, participants may wonder whether the line is closed, wrong, or less legitimate. This normality interpretation was not the dominant pattern, but it makes the research question more interesting. Queue length may shape choice through cost, credibility, and normality at the same time.
+
+Several limitations should be noted. First, the dataset contained submissions rather than confirmed unique participants. A stable anonymous session identifier should be added so that future analyses can distinguish submissions from people. Second, at least one highly similar pair of submissions appeared likely to be a duplicate. Third, some written responses were low-attention, random, or playful. Future reports should compare full-sample results with cleaned results that mark duplicate and low-attention submissions. Fourth, timed and untimed versions may reflect different psychological processes. The timed condition may capture rapid visual judgment, while the untimed condition may allow more deliberate reasoning.
+
+Despite these limitations, the project provides a useful classroom-scale demonstration of how an interactive artifact can test a social science question. The results suggest that queue length should not be treated as a single social signal. Instead, a visible long line combines social proof, waiting cost, normality, and spatial salience. A stronger future version of the study could manipulate these meanings separately by adding estimated waiting time, explicit statements that the entrances are equivalent, or text-based social norm cues. Such extensions would make it possible to test when students treat a long line as a cost and when they treat it as information.
+
+\section{References}
+
+\begingroup
+\setlength{\parindent}{-0.5in}
+\setlength{\leftskip}{0.5in}
+\setlength{\parskip}{0.7em}
+
+\noindent Anderson, L. R., \& Holt, C. A. (1997). Information cascades in the laboratory. \textit{American Economic Review, 87}(5), 847--862. \url{https://doi.org/10.1257/aer.87.5.847}
+
+\noindent Banerjee, A. V. (1992). A simple model of herd behavior. \textit{The Quarterly Journal of Economics, 107}(3), 797--817. \url{https://doi.org/10.2307/2118364}
+
+\noindent Bikhchandani, S., Hirshleifer, D., \& Welch, I. (1992). A theory of fads, fashion, custom, and cultural change as informational cascades. \textit{Journal of Political Economy, 100}(5), 992--1026. \url{https://doi.org/10.1086/261849}
+
+\noindent Cai, H., Chen, Y., \& Fang, H. (2009). Observational learning: Evidence from a randomized natural field experiment. \textit{American Economic Review, 99}(3), 864--882. \url{https://doi.org/10.1257/aer.99.3.864}
+
+\noindent Celen, B., \& Kariv, S. (2004). Distinguishing informational cascades from herd behavior in the laboratory. \textit{American Economic Review, 94}(3), 484--498. \url{https://doi.org/10.1257/0002828041464461}
+
+\noindent Muchnik, L., Aral, S., \& Taylor, S. J. (2013). Social influence bias: A randomized experiment. \textit{Science, 341}(6146), 647--651. \url{https://doi.org/10.1126/science.1240466}
+
+\noindent Salganik, M. J., Dodds, P. S., \& Watts, D. J. (2006). Experimental study of inequality and unpredictability in an artificial cultural market. \textit{Science, 311}(5762), 854--856. \url{https://doi.org/10.1126/science.1121066}
+
+\noindent Zhou, R., \& Soman, D. (2003). Looking back: Exploring the psychology of queuing and the effect of the number of people behind. \textit{Journal of Consumer Research, 29}(4), 517--530. \url{https://doi.org/10.1086/346247}
+
+\endgroup
+
+\end{document}
