@@ -9,3 +9,17 @@ midterm-presentation/archive/
 midterm-presentation/preview/
 midterm-presentation/*.pptx
 midterm-presentation/*.pdf
+
+# Local project notes, MCP setup, and exported research data
+.mcp.json
+MCP.md
+exports/
+
+# Local course/reference materials
+前期资料/
+26.6.3 课题初稿.png
+AI for Social Sciences课表.pdf
+
+# Local presentation-generation scratch files
+midterm-presentation/make-midterm-pptx.js
+midterm-presentation/prototype-*.png
